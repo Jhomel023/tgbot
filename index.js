@@ -168,6 +168,7 @@ bot.onText(/\/avs (.+)/, async (msg, match) => {
         const endTime = ((Date.now() - startTime) / 1000).toFixed(2);
         
         let msgResult = respData.messages ? respData.messages.replace(/<[^>]*>?/gm, '').trim() : JSON.stringify(respData);
+        if (msgResult.length > 200) msgResult = msgResult.substring(0, 200) + '...';
 
         let finalResponse = `Card: ${lista}\n`;
         if (respData.result === 'success') {
@@ -184,7 +185,9 @@ bot.onText(/\/avs (.+)/, async (msg, match) => {
         bot.sendMessage(chatId, finalResponse);
 
     } catch (error) {
-        bot.sendMessage(chatId, `Error: ${error.message}`);
+        let errMessage = error.message;
+        if (errMessage.length > 200) errMessage = errMessage.substring(0, 200) + '...';
+        bot.sendMessage(chatId, `Error: ${errMessage}`);
     }
 });
 
