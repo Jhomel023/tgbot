@@ -41,7 +41,6 @@ const addresses = [
 const randomEmails = ['jhefvrix', 'shawnph', 'testuser', 'fireflybuyer', 'user99x'];
 const ua = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 
-// Helper function para i-process ang isang CC
 async function processCard(lista) {
     const startTime = Date.now();
     const parts = lista.split(/[:|]/);
@@ -54,26 +53,33 @@ async function processCard(lista) {
         ano = ano.slice(2);
     }
 
+    // Accurate BIN Lookup gamit ang binlist.net na may fallback
     let binData = { brand: 'N/A', type: 'N/A', category: 'N/A', bank: 'N/A', country: 'N/A', emoji: '🌐' };
     try {
         const binClean = cc.replace(/\s+/g, '').substring(0, 6);
-        const binRes = await axios.get(`https://lookup.binlist.net/${binClean}`, { timeout: 5000 });
+        const binRes = await axios.get(`https://lookup.binlist.net/${binClean}`, {
+            headers: { 'Accept-Version': '3' },
+            timeout: 5000 
+        });
         if (binRes.data) {
-            binData.brand = binRes.data.brand || 'N/A';
+            binData.brand = binRes.data.scheme ? binRes.data.scheme.toUpperCase() : 'N/A';
             binData.type = binRes.data.type ? binRes.data.type.toUpperCase() : 'N/A';
-            binData.category = binRes.data.category ? binRes.data.category.toUpperCase() : 'N/A';
+            binData.category = binRes.data.brand ? binRes.data.brand.toUpperCase() : 'N/A';
             binData.bank = binRes.data.bank && binRes.data.bank.name ? binRes.data.bank.name.toUpperCase() : 'N/A';
             binData.country = binRes.data.country && binRes.data.country.name ? binRes.data.country.name.toUpperCase() : 'N/A';
             binData.emoji = binRes.data.country && binRes.data.country.emoji ? binRes.data.country.emoji : '🌐';
         }
-    } catch (err) {}
+    } catch (err) {
+        // Fallback kung sakaling mag-timeout ang binlist
+        binData.brand = cc.startsWith('4') ? 'VISA' : cc.startsWith('5') ? 'MASTERCARD' : cc.startsWith('3') ? 'AMEX' : 'UNKNOWN';
+    }
 
     try {
         const jar = new CookieJar();
         const client = wrapper(axios.create({
             jar,
             proxy: proxyConfig,
-            timeout: 30000,
+            timeout: 25000,
             validateStatus: () => true
         }));
 
@@ -171,7 +177,6 @@ async function processCard(lista) {
         if (message.toLowerCase().includes('address provided does not match') || message.toLowerCase().includes('avs mismatch')) {
             chargeType = 'CVV (Live / AVS Mismatch)';
             statusIcon = '✅';
-            message = 'The transaction has been declined because of an AVS mismatch. (Live)';
         } else if (message.toLowerCase().includes('invalid cvv') || message.toLowerCase().includes('insufficient funds')) {
             chargeType = 'CCN';
             statusIcon = '⚠️';
@@ -200,33 +205,31 @@ async function processCard(lista) {
     }
 }
 
-// Handler para sa Text Command (/avs o /g) kasama ang multi-card support (max 10)
-bot.onText(/\/(?:avs|g) (.+)/, async (msg, match) => {
+bot.onText(/\/(?:avs|g) ([\s\S]+)/, async (msg, match) => {
     const chatId = msg.chat.id;
     const inputContent = match[1].trim();
 
-    // Kunin ang bawat linya o hiwalayin gamit ang newline, max 10
-    const lines = inputContent.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-    const cards = lines.slice(0, 10); // Limit sa maximum 10 CCs
+    const lines = inputContent.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+    const cards = lines.slice(0, 10);
 
     if (cards.length === 0) {
         return bot.sendMessage(chatId, `⚠️ Please provide at least one card! Format: \`/avs cc|mm|yy|cvv\``, { parse_mode: 'Markdown' });
     }
 
-    bot.sendMessage(chatId, `🔍 **Checking ${cards.length} card(s)... Please wait.**`, { parse_mode: 'Markdown' });
+    bot.sendMessage(chatId, `🚀 **Checking ${cards.length} card(s) concurrently... Please wait.**`, { parse_mode: 'Markdown' });
 
-    for (const card of cards) {
-        const resultMsg = await processCard(card);
+    const promises = cards.map(card => processCard(card));
+    const results = await Promise.all(promises);
+
+    for (const resultMsg of results) {
         await bot.sendMessage(chatId, resultMsg, { parse_mode: 'Markdown' });
     }
 });
 
-// Handler para sa pag-upload ng .txt file (.txt file na may listahan ng CC, max 10)
 bot.on('document', async (msg) => {
     const chatId = msg.chat.id;
     const document = msg.document;
 
-    // I-check kung text file ang inupload
     if (document.mime_type === 'text/plain' || document.file_name.endsWith('.txt')) {
         try {
             bot.sendMessage(chatId, `📥 **Downloading and processing file...**`, { parse_mode: 'Markdown' });
@@ -236,16 +239,18 @@ bot.on('document', async (msg) => {
             const fileContent = fileRes.data;
 
             const lines = fileContent.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
-            const cards = lines.slice(0, 10); // Limit sa maximum 10 CCs
+            const cards = lines.slice(0, 10);
 
             if (cards.length === 0) {
-                return bot.sendMessage(chatId, `⚠️ The uploaded file is empty or invalid format!`, { parse_mode: 'Markdown' });
+                return bot.sendMessage(chatId, `⚠️ The uploaded file is empty or invalid format!`, { parse_Mode: 'Markdown' });
             }
 
-            bot.sendMessage(chatId, `🔍 **Found ${cards.length} card(s) in file. Checking now...**`, { parse_mode: 'Markdown' });
+            bot.sendMessage(chatId, `🚀 **Found ${cards.length} card(s) in file. Checking concurrently...**`, { parse_mode: 'Markdown' });
 
-            for (const card of cards) {
-                const resultMsg = await processCard(card);
+            const promises = cards.map(card => processCard(card));
+            const results = await Promise.all(promises);
+
+            for (const resultMsg of results) {
                 await bot.sendMessage(chatId, resultMsg, { parse_mode: 'Markdown' });
             }
         } catch (err) {
