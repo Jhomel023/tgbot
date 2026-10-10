@@ -8,23 +8,17 @@ const token = process.env.TELEGRAM_BOT_TOKEN;
 const app = express();
 app.use(express.json());
 
-// Gamitin ang Render URL o fallback sa localhost port 3000
 const PORT = process.env.PORT || 3000;
 const RENDER_EXTERNAL_URL = process.env.RENDER_EXTERNAL_URL || `https://telbot-lvvm.onrender.com`;
 
-// Initialize Telegram Bot without polling (gamit webhook)
 const bot = new TelegramBot(token);
-
-// I-set ang webhook papunta sa Render URL mo
 bot.setWebHook(`${RENDER_EXTERNAL_URL}/bot${token}`);
 
-// Endpoint para sa webhook ng Telegram
 app.post(`/bot${token}`, (req, res) => {
     bot.processUpdate(req.body);
     res.sendStatus(200);
 });
 
-// Proxy Configuration
 const proxyConfig = {
     host: 'us-east.gw.rayobyte.com',
     port: 8000,
@@ -47,7 +41,8 @@ const addresses = [
 const randomEmails = ['jhefvrix', 'shawnph', 'testuser', 'fireflybuyer', 'user99x'];
 const ua = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 
-bot.onText(/\/avs (.+)/, async (msg, match) => {
+// Suportado pareho ang /avs at /g commands
+bot.onText(/\/(?:avs|g) (.+)/, async (msg, match) => {
     const chatId = msg.chat.id;
     const lista = match[1].trim();
     const startTime = Date.now();
@@ -65,6 +60,21 @@ bot.onText(/\/avs (.+)/, async (msg, match) => {
     bot.sendMessage(chatId, `🔍 **Checking Card:** \`${lista}\` ...`, { parse_mode: 'Markdown' });
 
     try {
+        // Fetch BIN Details galing sa libreng binlist API
+        let binData = { brand: 'N/A', type: 'N/A', category: 'N/A', bank: 'N/A', country: 'N/A', emoji: '🌐' };
+        try {
+            const binClean = cc.replace(/\s+/g, '').substring(0, 6);
+            const binRes = await axios.get(`https://lookup.binlist.net/${binClean}`, { timeout: 5000 });
+            if (binRes.data) {
+                binData.brand = binRes.data.brand || 'N/A';
+                binData.type = binRes.data.type ? binRes.data.type.toUpperCase() : 'N/A';
+                binData.category = binRes.data.category ? binRes.data.category.toUpperCase() : 'N/A';
+                binData.bank = binRes.data.bank && binRes.data.bank.name ? binRes.data.bank.name.toUpperCase() : 'N/A';
+                binData.country = binRes.data.country && binRes.data.country.name ? binRes.data.country.name.toUpperCase() : 'N/A';
+                binData.emoji = binRes.data.country && binRes.data.country.emoji ? binRes.data.country.emoji : '🌐';
+            }
+        } catch (err) {}
+
         const jar = new CookieJar();
         const client = wrapper(axios.create({
             jar,
@@ -174,21 +184,34 @@ bot.onText(/\/avs (.+)/, async (msg, match) => {
 
         const overallTime = ((Date.now() - startTime) / 1000).toFixed(2);
 
-        let finalResponse = `💳 **Card:** \`${lista}\`\n`;
-        finalResponse += `━━━━━━━━━━━━━━━━━━━━\n`;
+        // Styling na kauri ng larawan mo (Tree format)
+        let statusText = 'DECLINED';
+        let chargeType = 'DECLINED';
 
         if (message.includes('address provided does not match') || message.includes('AVS mismatch')) {
-            finalResponse += `🟢 **Status:** \`#CVV - Address Mismatch (Live)\`\n💬 **Reason:** \`${message}\`\n`;
+            statusText = '#CVV - Address Mismatch (Live)';
+            chargeType = 'CVV';
         } else if (message.includes('Invalid CVV') || message.includes('Insufficient funds')) {
-            finalResponse += `🟡 **Status:** \`#CCN\`\n💬 **Reason:** \`${message}\`\n`;
+            statusText = '#CCN';
+            chargeType = 'CCN';
         } else if (result === 'success') {
-            finalResponse += `🔥 **Status:** \`#CVV - CHARGED $3.90\`\n📦 **Order ID:** \`${od}\`\n`;
-        } else {
-            finalResponse += `❌ **Status:** \`DECLINED\`\n💬 **Reason:** \`${message}\`\n`;
+            statusText = '#CVV - CHARGED $3.90';
+            chargeType = 'CVV CHARGED';
         }
 
-        finalResponse += `━━━━━━━━━━━━━━━━━━━━\n`;
-        finalResponse += `⏱ **Time:** \`${overallTime}s\` | 🌐 **IP:** \`${ip}\``;
+        let finalResponse = `┏• CC: \`${lista}\`\n`;
+        finalResponse += `┣• ❌ ${message}\n`;
+        finalResponse += `┣• Charge Type: ${chargeType}\n`;
+        finalResponse += `┣• Gateway: FireflyFuel | AVS Checker\n`;
+        finalResponse += `┗• Execution Time: ${overallTime} seconds\n\n`;
+        
+        finalResponse += `┏• BIN DATA\n`;
+        finalResponse += `┣• Bin: \`${cc.substring(0, 6)}\`\n`;
+        finalResponse += `┣• Brand Code: ${binData.brand.toUpperCase()}\n`;
+        finalResponse += `┣• Category: ${binData.category}\n`;
+        finalResponse += `┣• Card Type: ${binData.type}\n`;
+        finalResponse += `┣• Issuing Bank: ${binData.bank}\n`;
+        finalResponse += `┗• Country: ${binData.emoji} -${binData.country}`;
 
         bot.sendMessage(chatId, finalResponse, { parse_mode: 'Markdown' });
 
