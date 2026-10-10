@@ -41,6 +41,45 @@ const addresses = [
 const randomEmails = ['jhefvrix', 'shawnph', 'testuser', 'fireflybuyer', 'user99x'];
 const ua = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 
+async function getBinDetails(cc) {
+    const binClean = cc.replace(/\s+/g, '').substring(0, 6);
+    let binData = { brand: 'N/A', type: 'N/A', category: 'N/A', bank: 'N/A', country: 'N/A', emoji: '🌐' };
+
+    try {
+        // Subukan muna ang binlist.net
+        const res = await axios.get(`https://lookup.binlist.net/${binClean}`, {
+            headers: { 'Accept-Version': '3' },
+            timeout: 3000
+        });
+        if (res.data) {
+            binData.brand = res.data.scheme ? res.data.scheme.toUpperCase() : 'N/A';
+            binData.type = res.data.type ? res.data.type.toUpperCase() : 'N/A';
+            binData.category = res.data.brand ? res.data.brand.toUpperCase() : 'N/A';
+            binData.bank = res.data.bank && res.data.bank.name ? res.data.bank.name.toUpperCase() : 'N/A';
+            binData.country = res.data.country && res.data.country.name ? res.data.country.name.toUpperCase() : 'N/A';
+            binData.emoji = res.data.country && res.data.country.emoji ? res.data.country.emoji : '🌐';
+            return binData;
+        }
+    } catch (e) {
+        // Kung mag-fail, gamitin ang alternative API: db.bincodes.com o pangalawang source
+        try {
+            const res2 = await axios.get(`https://data.handyapi.com/bin/${binClean}`, { timeout: 3000 });
+            if (res2.data && res2.data.Scheme) {
+                binData.brand = res2.data.Scheme || 'N/A';
+                binData.type = res2.data.Type || 'N/A';
+                binData.category = res2.data.CardClass || 'N/A';
+                binData.bank = res2.data.Issuer || 'N/A';
+                binData.country = res2.data.Country || 'N/A';
+                return binData;
+            }
+        } catch (err2) {}
+    }
+
+    // Basic Fallback kung sakaling offline ang APIs
+    binData.brand = cc.startsWith('4') ? 'VISA' : cc.startsWith('5') ? 'MASTERCARD' : cc.startsWith('3') ? 'AMEX' : 'UNKNOWN';
+    return binData;
+}
+
 async function processCard(lista) {
     const startTime = Date.now();
     const parts = lista.split(/[:|]/);
@@ -53,26 +92,8 @@ async function processCard(lista) {
         ano = ano.slice(2);
     }
 
-    // Accurate BIN Lookup gamit ang binlist.net na may fallback
-    let binData = { brand: 'N/A', type: 'N/A', category: 'N/A', bank: 'N/A', country: 'N/A', emoji: '🌐' };
-    try {
-        const binClean = cc.replace(/\s+/g, '').substring(0, 6);
-        const binRes = await axios.get(`https://lookup.binlist.net/${binClean}`, {
-            headers: { 'Accept-Version': '3' },
-            timeout: 5000 
-        });
-        if (binRes.data) {
-            binData.brand = binRes.data.scheme ? binRes.data.scheme.toUpperCase() : 'N/A';
-            binData.type = binRes.data.type ? binRes.data.type.toUpperCase() : 'N/A';
-            binData.category = binRes.data.brand ? binRes.data.brand.toUpperCase() : 'N/A';
-            binData.bank = binRes.data.bank && binRes.data.bank.name ? binRes.data.bank.name.toUpperCase() : 'N/A';
-            binData.country = binRes.data.country && binRes.data.country.name ? binRes.data.country.name.toUpperCase() : 'N/A';
-            binData.emoji = binRes.data.country && binRes.data.country.emoji ? binRes.data.country.emoji : '🌐';
-        }
-    } catch (err) {
-        // Fallback kung sakaling mag-timeout ang binlist
-        binData.brand = cc.startsWith('4') ? 'VISA' : cc.startsWith('5') ? 'MASTERCARD' : cc.startsWith('3') ? 'AMEX' : 'UNKNOWN';
-    }
+    // Kunin ang BIN Details bago mag-checkout
+    const binData = await getBinDetails(cc);
 
     try {
         const jar = new CookieJar();
@@ -242,7 +263,7 @@ bot.on('document', async (msg) => {
             const cards = lines.slice(0, 10);
 
             if (cards.length === 0) {
-                return bot.sendMessage(chatId, `⚠️ The uploaded file is empty or invalid format!`, { parse_Mode: 'Markdown' });
+                return bot.sendMessage(chatId, `⚠️ The uploaded file is empty or invalid format!`, { parse_mode: 'Markdown' });
             }
 
             bot.sendMessage(chatId, `🚀 **Found ${cards.length} card(s) in file. Checking concurrently...**`, { parse_mode: 'Markdown' });
