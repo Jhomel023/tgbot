@@ -59,7 +59,6 @@ bot.onText(/\/avs (.+)/, async (msg, match) => {
             validateStatus: () => true
         }));
 
-        // IP Check
         let ip = 'Unknown';
         try {
             const ipRes = await client.get('https://api64.ipify.org/?format=json');
@@ -201,9 +200,17 @@ bot.onText(/\/avs (.+)/, async (msg, match) => {
         });
 
         const ro2 = payRes.data;
-        const result = ro2 && ro2.result ? ro2.result : '';
-        let message = ro2 && ro2.messages ? ro2.messages.replace(/<[^>]*>?/gm, '').trim() : '';
-        const od = ro2 && ro2.order_id ? ro2.order_id : '';
+        let result = '';
+        let message = '';
+        let od = '';
+
+        if (typeof ro2 === 'object' && ro2 !== null) {
+            result = ro2.result || '';
+            message = ro2.messages ? ro2.messages.replace(/<[^>]*>?/gm, '').trim() : '';
+            od = ro2.order_id || '';
+        } else {
+            message = typeof ro2 === 'string' ? ro2.replace(/<[^>]*>?/gm, '').substring(0, 100) : 'Invalid server response';
+        }
 
         const overallTime = ((Date.now() - startTime) / 1000).toFixed(2);
 
@@ -220,7 +227,7 @@ bot.onText(/\/avs (.+)/, async (msg, match) => {
         } else if (message === 'Payment instrument type is not accepted by this merchant account.') {
             finalResponse += `STATUS: [DECLINED] Payment instrument type not accepted.\n`;
         } else {
-            finalResponse += `STATUS: [DECLINED]\nReason: ${message || 'Unknown error'}\n`;
+            finalResponse += `STATUS: [DECLINED]\nReason: ${message || 'Declined / Unknown response'}\n`;
         }
 
         finalResponse += `Time: ${overallTime}s | IP: ${ip}`;
