@@ -236,7 +236,6 @@ bot.onText(/\/(?:avs|g) ([\s\S]+)/, async (msg, match) => {
 
     bot.sendMessage(chatId, `🚀 **Checking ${cards.length} card(s)... Please wait.**`, { parse_mode: 'Markdown' });
 
-    // Batch processing (isinasagawa nang pa-grupo ng tig-2 cards para mabilis at hindi mag-timeout)
     for (let i = 0; i < cards.length; i += 2) {
         const batch = cards.slice(i, i + 2);
         const promises = batch.map(card => processCard(card));
