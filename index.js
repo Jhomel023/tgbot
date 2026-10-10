@@ -167,18 +167,23 @@ bot.onText(/\/avs (.+)/, async (msg, match) => {
         const respData = payRes.data;
         const endTime = ((Date.now() - startTime) / 1000).toFixed(2);
         
-        let msgResult = respData.messages ? respData.messages.replace(/<[^>]*>?/gm, '').trim() : JSON.stringify(respData);
+        let msgResult = '';
+        if (typeof respData === 'object' && respData !== null) {
+            msgResult = respData.messages ? respData.messages.replace(/<[^>]*>?/gm, '').trim() : JSON.stringify(respData);
+        } else {
+            msgResult = "Nag-respond ng HTML/Text ang server (posibleng block/captcha).";
+        }
         if (msgResult.length > 200) msgResult = msgResult.substring(0, 200) + '...';
 
         let finalResponse = `Card: ${lista}\n`;
-        if (respData.result === 'success') {
+        if (typeof respData === 'object' && respData !== null && respData.result === 'success') {
             finalResponse += `STATUS: CHARGED ($3.90)\nOrder ID: ${respData.order_id || 'N/A'}\n`;
         } else if (msgResult.includes('Address provided does not match')) {
             finalResponse += `STATUS: CVV / Address Mismatch\n`;
         } else if (msgResult.includes('Invalid CVV') || msgResult.includes('Insufficient funds')) {
             finalResponse += `STATUS: CCN (${msgResult})\n`;
         } else {
-            finalResponse += `STATUS: DECLINED\nReason: ${msgResult}\n`;
+            finalResponse += `STATUS: BLOCKED / DECLINED\nReason: ${msgResult}\n`;
         }
         finalResponse += `Time: ${endTime}s | IP: ${ip}`;
 
